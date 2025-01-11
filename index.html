@@ -174,11 +174,11 @@
                         <div id="timer-display" class="text-3xl font-bold text-center my-4 text-gray-800">
                             00:00
                         </div>
-                        <div class="timer-controls">
-                            <button id="start-button" class="control-button bg-blue-500 hover:bg-blue-600 text-white rounded-lg">시작</button>
-                            <button id="pause-button" class="control-button bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg">일시정지</button>
-                            <button id="reset-button" class="control-button bg-red-500 hover:bg-red-600 text-white rounded-lg">초기화</button>
-                        </div>
+                        <div class="timer-controls flex flex-col gap-2">
+    <button id="start-button" class="control-button bg-blue-500 hover:bg-blue-600 text-white rounded-lg w-full">시작</button>
+    <button id="pause-button" class="control-button bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg w-full">일시정지</button>
+    <button id="reset-button" class="control-button bg-red-500 hover:bg-red-600 text-white rounded-lg w-full">초기화</button>
+</div>
                     </div>
 
                     <!-- 알람 섹션 -->
@@ -446,6 +446,15 @@ function saveMemoToLocalStorage() {
     
     localStorage.setItem('memos2025', JSON.stringify(memos));
 }
+function saveMemoToLocalStorage() {
+    const memos = Array.from(document.querySelectorAll('#memo-list > div')).map(memo => ({
+        id: memo.id,
+        text: memo.querySelector('textarea').value,
+        color: Array.from(memo.classList)[0]
+    }));
+    
+    localStorage.setItem('memos2025', JSON.stringify(memos));
+}
 
 function loadMemoFromLocalStorage() {
     const memos = JSON.parse(localStorage.getItem('memos2025') || '[]');
@@ -458,13 +467,6 @@ function loadMemoFromLocalStorage() {
         memoDiv.id = memo.id;
         
         memoDiv.innerHTML = `
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-500">${memo.date}</span>
-                <button onclick="deleteMemo('${memo.id}')" 
-                        class="text-red-400 hover:text-red-600 transition duration-300">
-                    ✕
-                </button>
-            </div>
             <textarea 
                 class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-green-500"
                 placeholder="메모를 입력하세요"
@@ -480,6 +482,7 @@ function loadMemoFromLocalStorage() {
         addMemo();
     }
 }
+     
        // 버킷리스트 관련 함수
 function toggleBucketList() {
     const content = document.getElementById('bucketListContent');
