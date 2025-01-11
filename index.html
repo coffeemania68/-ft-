@@ -230,12 +230,11 @@
                         + 새로운 목표 추가
                     </button>
                 </div>
-            </div>
-
-                <!-- 월별 플래너 섹션 -->
-                <div id="monthly-planners" class="space-y-4">
-                    <!-- 월별 플래너는 JavaScript로 생성됩니다 -->
-                </div>
+            
+               <!-- 월별 플래너 섹션 -->
+              <div id="monthly-planners" class="w-full space-y-4 mt-6">
+                 <!-- 월별 플래너는 JavaScript로 생성됩니다 -->
+              </div>
             </div>
         </div>
     </div>
@@ -250,6 +249,23 @@
         <span>📥 백업 복원</span>
         <input type="file" onchange="importData(this.files[0])" class="hidden" accept=".json">
     </label>
+</div>
+<!-- 데이터 백업/복원 버튼 아래 공유 기능 추가 -->
+<div class="flex justify-end space-x-2 mt-4">
+     <button onclick="copyLink()" 
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center">
+         <span>🔗 링크 복사</span>
+     </button>
+    <!-- 카카오톡 공유 버튼 (구현 필요) -->
+   <button onclick="shareToKakaoTalk()"
+       class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center">
+       <span>💬 카카오톡</span>
+   </button>
+    <!-- 일반 SNS 공유 버튼 (구현 필요) -->
+    <button onclick="shareToSNS()"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
+       <span>📤 SNS 공유</span>
+   </button>
 </div>
             </div>
         </div>
@@ -288,10 +304,11 @@
 
 // 드래그 앤 드롭 기능 초기화 함수
 function initDragAndDrop() {
-    const containers = document.querySelectorAll('.timer-container, .alarm-container, .memo-container');
+    const containers = document.querySelectorAll('.timer-container, .alarm-container, .memo-container, .monthly-planner button');
     let draggedItem = null;
-  
+    
     containers.forEach(container => {
+      container.setAttribute('draggable', 'true');  // 드래그 가능 속성 추가
       container.addEventListener('dragstart', (e) => {
         draggedItem = e.target;
         e.dataTransfer.setData('text/plain', ''); // 필수, 드래그 시작을 인식
@@ -303,40 +320,71 @@ function initDragAndDrop() {
         draggedItem = null;
       });
   
-      container.addEventListener('dragover', (e) => {
-        e.preventDefault();
-      });
-  
-      container.addEventListener('dragenter', (e) => {
-        e.preventDefault();
-        if (e.target !== draggedItem && e.target.closest('.timer-container, .alarm-container, .memo-container')) {
-        e.target.closest('.timer-container, .alarm-container, .memo-container').classList.add('border-2', 'border-blue-500');
+       container.addEventListener('dragover', (e) => {
+            e.preventDefault();
+          
+            if (e.target !== draggedItem && e.target.closest('.monthly-planner button') || 
+            e.target !== draggedItem && e.target.closest('.timer-container, .alarm-container, .memo-container')) {
+            e.preventDefault(); // 이 부분이 중요합니다.
+             if (e.target.closest('.monthly-planner button')) {
+                e.target.closest('.monthly-planner button').classList.add('border-2', 'border-blue-500');
+            } else if (e.target.closest('.timer-container, .alarm-container, .memo-container')){
+                e.target.closest('.timer-container, .alarm-container, .memo-container').classList.add('border-2', 'border-blue-500');
+           }
         }
+        
       });
+      
+       container.addEventListener('dragenter', (e) => {
+        if (e.target !== draggedItem && e.target.closest('.monthly-planner button') || 
+        e.target !== draggedItem && e.target.closest('.timer-container, .alarm-container, .memo-container')) {
+          if (e.target.closest('.monthly-planner button')) {
+            e.target.closest('.monthly-planner button').classList.add('border-2', 'border-blue-500');
+         } else if (e.target.closest('.timer-container, .alarm-container, .memo-container')){
+             e.target.closest('.timer-container, .alarm-container, .memo-container').classList.add('border-2', 'border-blue-500');
+         }
+        }
+       });
   
        container.addEventListener('dragleave', (e) => {
-        if (e.target !== draggedItem && e.target.closest('.timer-container, .alarm-container, .memo-container')) {
-        e.target.closest('.timer-container, .alarm-container, .memo-container').classList.remove('border-2', 'border-blue-500');
+        if (e.target !== draggedItem && e.target.closest('.monthly-planner button') || 
+        e.target !== draggedItem && e.target.closest('.timer-container, .alarm-container, .memo-container')) {
+            if (e.target.closest('.monthly-planner button')) {
+                e.target.closest('.monthly-planner button').classList.remove('border-2', 'border-blue-500');
+            } else if(e.target.closest('.timer-container, .alarm-container, .memo-container')){
+                e.target.closest('.timer-container, .alarm-container, .memo-container').classList.remove('border-2', 'border-blue-500');
+            }
         }
       });
       
       container.addEventListener('drop', (e) => {
-        e.preventDefault();
-        if (e.target !== draggedItem && e.target.closest('.timer-container, .alarm-container, .memo-container')) {
-        const targetContainer = e.target.closest('.timer-container, .alarm-container, .memo-container');
-          if (draggedItem && targetContainer) {
-            const parent = targetContainer.parentNode;
-            const originalIndex = Array.from(parent.children).indexOf(draggedItem);
-            const dropIndex = Array.from(parent.children).indexOf(targetContainer);
-  
-             if(originalIndex < dropIndex){
-                 parent.insertBefore(draggedItem, targetContainer.nextSibling);
-             }else {
-                parent.insertBefore(draggedItem, targetContainer);
-             }
-          }
-             targetContainer.classList.remove('border-2', 'border-blue-500');
-        }
+            e.preventDefault();
+            if (e.target !== draggedItem && e.target.closest('.monthly-planner button') ||
+                e.target !== draggedItem && e.target.closest('.timer-container, .alarm-container, .memo-container')) {
+                  let targetContainer;
+                    if (e.target.closest('.monthly-planner button')) {
+                            targetContainer = e.target.closest('.monthly-planner button') ;
+                       } else if (e.target.closest('.timer-container, .alarm-container, .memo-container')){
+                          targetContainer = e.target.closest('.timer-container, .alarm-container, .memo-container');
+                       }
+                   if (draggedItem && targetContainer) {
+                       const parent = targetContainer.parentNode;
+                       const originalIndex = Array.from(parent.children).indexOf(draggedItem);
+                       const dropIndex = Array.from(parent.children).indexOf(targetContainer);
+         
+                    if (originalIndex < dropIndex) {
+                        parent.insertBefore(draggedItem, targetContainer.nextSibling);
+                    } else {
+                        parent.insertBefore(draggedItem, targetContainer);
+                    }
+                    }
+
+                      if (e.target.closest('.monthly-planner button')) {
+                        e.target.closest('.monthly-planner button').classList.remove('border-2', 'border-blue-500');
+                     }else if (e.target.closest('.timer-container, .alarm-container, .memo-container')){
+                        e.target.closest('.timer-container, .alarm-container, .memo-container').classList.remove('border-2', 'border-blue-500');
+                     }
+           }
       });
     });
   }
@@ -524,7 +572,7 @@ function addBucketListItem() {
     const container = document.getElementById('bucketListItems');
     const itemId = 'item-' + Date.now();
     const itemDiv = document.createElement('div');
-    itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
+        itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
     itemDiv.id = itemId;
     
     itemDiv.innerHTML = `
@@ -717,7 +765,7 @@ function loadMonthlyData(month) {
                         삭제
                     </button>
                 </div>
-                            <textarea class="w-full p-2 border rounded-md" 
+                <textarea class="w-full p-2 border rounded-md" 
                           placeholder="이번 주 계획을 입력하세요"
                           onchange="saveMonthlyData(${month})">${week.text || ''}</textarea>
             `;
@@ -788,10 +836,30 @@ function importData(file) {
 for (let month = 1; month <= 12; month++) {
         loadMonthlyData(month);
     }
+     
+    function copyLink() {
+        const dummy = document.createElement('input');
+        document.body.appendChild(dummy);
+        dummy.value = window.location.href;
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        alert('링크가 복사되었습니다.');
+    }
+      
+    function shareToKakaoTalk() {
+    // 카카오톡 공유 API 또는 링크 생성 로직 구현
+      alert('카카오톡 공유 기능은 현재 구현되지 않았습니다.');
+    }
+
+   function shareToSNS() {
+       // SNS 공유 로직 구현 (웹 공유 API 또는 해당 SNS의 공유 기능 활용)
+     alert('SNS 공유 기능은 현재 구현되지 않았습니다.');
+    }
   </script> 
 <footer class="text-center text-gray-600 text-sm mt-8 pb-4">
     © 2025 CoffeeMania's Planner. All rights reserved.
 </footer>    
 </body>
 </html>
-                
+    
