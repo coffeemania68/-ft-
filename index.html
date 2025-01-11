@@ -164,22 +164,22 @@
  <div class="w-1/4 min-w-[300px]">
                 <div id="side-container" class="side-container">
                     <!-- 타이머 섹션 -->
-                    <div class="timer-container" draggable="true">
-                        <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">작업 타이머</h2>
-                        <select id="timer-duration" class="w-full p-2 mb-3 border rounded-lg bg-white/80">
-                            <option value="60">1시간</option>
-                            <option value="120">2시간</option>
-                            <option value="180">3시간</option>
-                        </select>
-                        <div id="timer-display" class="text-3xl font-bold text-center my-4 text-gray-800">
-                            00:00
-                        </div>
-                        <div class="timer-controls flex flex-col gap-2">
-    <button id="start-button" class="control-button bg-blue-500 hover:bg-blue-600 text-white rounded-lg w-full">시작</button>
-    <button id="pause-button" class="control-button bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg w-full">일시정지</button>
-    <button id="reset-button" class="control-button bg-red-500 hover:bg-red-600 text-white rounded-lg w-full">초기화</button>
-</div>
-                    </div>
+<div class="timer-container" draggable="true">
+    <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">작업 타이머</h2>
+    <select id="timer-duration" class="w-full p-2 mb-3 border rounded-lg bg-white/80">
+        <option value="60">1시간</option>
+        <option value="120">2시간</option>
+        <option value="180">3시간</option>
+    </select>
+    <div id="timer-display" class="text-3xl font-bold text-center my-4 text-gray-800">
+        01:00
+    </div>
+    <div class="grid grid-cols-3 gap-2">
+        <button id="start-button" class="control-button bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg">시작</button>
+        <button id="pause-button" class="control-button bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg">일시정지</button>
+        <button id="reset-button" class="control-button bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">초기화</button>
+    </div>
+</div>                   
 
                     <!-- 알람 섹션 -->
                     <div class="alarm-container" draggable="true">
@@ -204,11 +204,12 @@
             <!-- 오른쪽 메인 컨텐츠 -->
             <div class="w-3/4">
                 <!-- 버킷리스트 섹션 -->
-                <div class="mb-6">
-                    <button id="bucketListBtn" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
-                        <span class="text-lg font-semibold">2025 버킷리스트</span>
-                        <span id="bucket-list-arrow">▼</span>
-                    </button>
+<div class="mb-8">  <!-- mb-6에서 mb-8로 변경하여 간격 증가 -->
+    <button id="bucketListBtn" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
+        <span class="text-lg font-semibold">2025 버킷리스트</span>
+        <span id="bucket-list-arrow">▼</span>
+    </button>
+                
                     <div id="bucketListContent" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
                         <div id="bucketListItems" class="space-y-4">
                             <!-- 버킷리스트 아이템들이 여기에 추가됩니다 -->
@@ -363,19 +364,16 @@ function addMemo() {
     memoDiv.id = memoId;
     
     memoDiv.innerHTML = `
-        <div class="flex justify-between items-center mb-2">
-            <span class="text-sm text-gray-500">${new Date().toLocaleDateString()}</span>
+        <div class="flex items-center">
+            <textarea 
+                class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-green-500"
+                placeholder="메모를 입력하세요"
+                rows="1"
+                onchange="saveMemoToLocalStorage()"
+            ></textarea>
             <button onclick="deleteMemo('${memoId}')" 
-                    class="text-red-400 hover:text-red-600 transition duration-300">
-                ✕
-            </button>
+                    class="text-red-400 hover:text-red-600 ml-2">✕</button>
         </div>
-        <textarea 
-            class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-green-500"
-            placeholder="메모를 입력하세요"
-            rows="1"
-            onchange="saveMemoToLocalStorage()"
-        ></textarea>
     `;
     
     const memoList = document.getElementById('memo-list');
