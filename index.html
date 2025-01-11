@@ -76,79 +76,7 @@
         .control-button:hover {
             transform: translateY(-1px);
         }
-
-        /* 모바일 반응형 */
-        @media (max-width: 768px) {
-    .container .flex {
-        flex-direction: column;
-    }
-    
-    /* 사이드바 컨테이너 모바일 스타일 */
-    .side-container {
-        position: relative;
-        width: 100%;
-        flex-direction: row;
-        gap: 0.5rem;
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    /* 타이머와 알람 컨테이너 모바일 스타일 */
-    .timer-container, .alarm-container {
-        flex: 1;
-        padding: 0.75rem;
-        font-size: 0.9rem;
-    }
-
-    /* 타이머 디스플레이 크기 조정 */
-    .timer-container #timer-display {
-        font-size: 1.5rem;
-    }
-
-    /* 타이머 버튼 크기 조정 */
-    .timer-container .timer-controls button {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8rem;
-    }
-
-    /* 메모 컨테이너 모바일에서 숨기기 */
-    .memo-container {
-        display: none;
-    }
-
-    /* 버킷리스트와 플래너 전체 너비로 설정 */
-    .w-3/4 {
-        width: 100%;
-    }
-
-    /* 사이드바 너비 조정 */
-    .w-1/4 {
-        width: 100%;
-        min-width: 100%;
-    }
-}
-
-/* 추가적인 모바일 최적화 스타일 */
-@media (max-width: 480px) {
-    .timer-container .timer-controls {
-        display: flex;
-        gap: 0.25rem;
-    }
-
-    .timer-container select,
-    .alarm-container input[type="time"] {
-        font-size: 0.9rem;
-        padding: 0.25rem;
-    }
-
-    /* 헤더 텍스트 크기 조정 */
-    .timer-container h2,
-    .alarm-container h2 {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-    }
-}
-                     /* style 태그 내에 추가 */
+               
 /* 월별 버튼 스타일 */
 .month-1-btn { background: linear-gradient(135deg, #90caf9, #42a5f5); }
 .month-2-btn { background: linear-gradient(135deg, #f48fb1, #ec407a); }
@@ -162,7 +90,69 @@
 .month-10-btn { background: linear-gradient(135deg, #ff8a65, #f4511e); }
 .month-11-btn { background: linear-gradient(135deg, #ba68c8, #8e24aa); }
 .month-12-btn { background: linear-gradient(135deg, #9fa8da, #5c6bc0); }
-    </style>
+
+        /* 모바일 반응형 */
+ @media (max-width: 768px) {
+    .container .flex {
+        flex-direction: column;
+    }
+    
+    .side-container {
+        position: relative;
+        width: 100%;
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .timer-container, .alarm-container {
+        flex: 1;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .timer-container #timer-display {
+        font-size: 1.5rem;
+    }
+
+    .timer-controls {
+        gap: 0.25rem;
+    }
+
+    .timer-controls button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .memo-container {
+        display: none;
+    }
+
+    .w-3/4 {
+        width: 100%;
+    }
+
+    .w-1/4 {
+        width: 100%;
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .timer-container select,
+    .alarm-container input[type="time"] {
+        font-size: 0.9rem;
+        padding: 0.25rem;
+    }
+
+    .timer-container h2,
+    .alarm-container h2 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+}
+     </style>
 </head>
 
 <body>
@@ -171,52 +161,40 @@
         <div class="flex flex-row gap-6">
            
             <!-- 왼쪽 사이드바 -->
-<div class="w-1/4 min-w-[300px] md:min-w-[250px]">
-    <div id="side-container" class="side-container">
-        <!-- 타이머 섹션 -->
-        <div class="timer-container" draggable="true">
-            <h2 class="text-xl font-semibold mb-2 text-center text-gray-800">타이머</h2>
-            <select id="timer-duration" class="w-full p-2 mb-2 border rounded-lg bg-white/80">
-                <option value="60">1시간</option>
-                <option value="120">2시간</option>
-                <option value="180">3시간</option>
-            </select>
-            <div id="timer-display" class="text-2xl font-bold text-center mb-2 text-gray-800">
-                00:00
-            </div>
-            <div class="timer-controls flex justify-center gap-1">
-                <button id="start-button" class="control-button bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded-lg text-sm">
-                    시작
-                </button>
-                <button id="pause-button" class="control-button bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded-lg text-sm">
-                    일시정지
-                </button>
-                <button id="reset-button" class="control-button bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg text-sm">
-                    초기화
-                </button>
-            </div>
-        </div>
+ <div class="w-1/4 min-w-[300px]">
+                <div id="side-container" class="side-container">
+                    <!-- 타이머 섹션 -->
+                    <div class="timer-container" draggable="true">
+                        <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">작업 타이머</h2>
+                        <select id="timer-duration" class="w-full p-2 mb-3 border rounded-lg bg-white/80">
+                            <option value="60">1시간</option>
+                            <option value="120">2시간</option>
+                            <option value="180">3시간</option>
+                        </select>
+                        <div id="timer-display" class="text-3xl font-bold text-center my-4 text-gray-800">
+                            00:00
+                        </div>
+                        <div class="timer-controls">
+                            <button id="start-button" class="control-button bg-blue-500 hover:bg-blue-600 text-white rounded-lg">시작</button>
+                            <button id="pause-button" class="control-button bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg">일시정지</button>
+                            <button id="reset-button" class="control-button bg-red-500 hover:bg-red-600 text-white rounded-lg">초기화</button>
+                        </div>
+                    </div>
 
-        <!-- 알람 섹션 -->
-        <div class="alarm-container" draggable="true">
-            <h2 class="text-xl font-semibold mb-2 text-center text-gray-800">알람</h2>
-            <input type="time" id="alarm-time" class="w-full p-2 border rounded-lg bg-white/80 mb-2">
-            <p id="alarm-display" class="text-center text-sm text-gray-600"></p>
-        </div>
+                    <!-- 알람 섹션 -->
+                    <div class="alarm-container" draggable="true">
+                        <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">알람 설정</h2>
+                        <input type="time" id="alarm-time" class="w-full p-2 border rounded-lg bg-white/80 mb-3">
+                        <p id="alarm-display" class="text-center text-gray-600"></p>
+                    </div>
 
-        <!-- 메모 섹션 (모바일에서는 숨겨짐) -->
-        <div class="memo-container" draggable="true">
-            <!-- 기존 메모 컨텐츠 유지 -->
-        </div>
-    </div>
-</div>
-
+                    <!-- 메모 섹션 -->
+                    <div class="memo-container" draggable="true">
                         <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">메모</h2>
                         <div id="memo-list" class="space-y-3">
                             <!-- 메모들이 여기에 추가됩니다 -->
                         </div>
-                        <button onclick="addMemo()" 
-                                class="mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300">
+                        <button onclick="addMemo()" class="mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300">
                             + 새 메모 추가
                         </button>
                     </div>
@@ -225,30 +203,29 @@
 
             <!-- 오른쪽 메인 컨텐츠 -->
             <div class="w-3/4">
-                <!-- 여기에 기존 버킷리스트와 월별 플래너 코드가 들어갑니다 -->
-   
-     <!-- 버킷리스트 섹션 -->
-<div class="mb-6">
-    <button id="bucketListBtn" 
-            class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
-        <span class="text-lg font-semibold">2025 버킷리스트</span>
-        <span id="bucket-list-arrow">▼</span>
-    </button>
-    <div id="bucketListContent" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
-        <div id="bucketListItems" class="space-y-4">
-            <!-- 버킷리스트 아이템들이 여기에 추가됩니다 -->
-        </div>
-        <button onclick="addBucketListItem()" 
-                class="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
-            + 새로운 목표 추가
-        </button>
-    </div>
-</div>
+                <!-- 버킷리스트 섹션 -->
+                <div class="mb-6">
+                    <button id="bucketListBtn" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                        <span class="text-lg font-semibold">2025 버킷리스트</span>
+                        <span id="bucket-list-arrow">▼</span>
+                    </button>
+                    <div id="bucketListContent" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
+                        <div id="bucketListItems" class="space-y-4">
+                            <!-- 버킷리스트 아이템들이 여기에 추가됩니다 -->
+                        </div>
+                        <button onclick="addBucketListItem()" class="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+                            + 새로운 목표 추가
+                        </button>
+                    </div>
+                </div>
 
-<!-- 월별 플래너 섹션 -->
-<div id="monthly-planners" class="space-y-4">
-    <!-- 월별 플래너는 JavaScript로 생성됩니다 -->
-</div>
+                <!-- 월별 플래너 섹션 -->
+                <div id="monthly-planners" class="space-y-4">
+                    <!-- 월별 플래너는 JavaScript로 생성됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
 
 <!-- 데이터 백업/복원 버튼 -->
 <div class="flex justify-end space-x-2 mt-4">
@@ -264,8 +241,10 @@
             </div>
         </div>
     </div>
-   <script>
-       document.addEventListener('DOMContentLoaded', () => {
+
+    
+ <script>
+ document.addEventListener('DOMContentLoaded', () => {
     // 드래그 앤 드롭 초기화
     initDragAndDrop();
     // 메모 로드
@@ -394,7 +373,7 @@ function addMemo() {
         <textarea 
             class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-green-500"
             placeholder="메모를 입력하세요"
-            rows="3"
+            rows="1"
             onchange="saveMemoToLocalStorage()"
         ></textarea>
     `;
@@ -489,7 +468,7 @@ function loadMemoFromLocalStorage() {
             <textarea 
                 class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-green-500"
                 placeholder="메모를 입력하세요"
-                rows="3"
+                rows="1"
                 onchange="saveMemoToLocalStorage()"
             >${memo.text || ''}</textarea>
         `;
