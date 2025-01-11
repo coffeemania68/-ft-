@@ -262,28 +262,57 @@
    <!-- 아래와 같이 수정하세요 -->
 <div class="container mx-auto p-4">
     <div class="flex flex-row gap-4">
-        <!-- 왼쪽 컬럼 -->
+        <!-- 왼쪽 컬럼: 타이머, 알람, 메모 -->
         <div class="w-1/4 min-w-[250px]">
             <div id="side-container" class="side-container">
-                <!-- 타이머, 알람, 메모 컨테이너는 그대로 유지 -->
-            </div>
+                <!-- 기존 타이머, 알람, 메모 코드 유지 -->
+                <div class="timer-container shadow-md cursor-move">
+                    <!-- 타이머 내용 -->
+                </div>
+                <div class="alarm-container shadow-md cursor-move">
+                    <!-- 알람 내용 -->
+                </div>
+<div class="memo-container shadow-md cursor-move">
+    <h2 class="text-xl font-semibold mb-2 text-center">메모</h2>
+    <div id="memo-list" class="space-y-2">
+        <!-- 메모들이 여기에 추가됩니다 -->
+    </div>
+    <button onclick="addMemo()" 
+            class="mt-4 w-full px-4 py-2 bg-gradient-to-r from-blue-400 to-indigo-500 text-white rounded-lg hover:from-blue-500 hover:to-indigo-600 transition duration-300">
+        + 새 메모 추가
+    </button>
+</div>             
+    </div>
         </div>
-        
-        <!-- 오른쪽 컬럼 -->
+
+        <!-- 오른쪽 컬럼: 버킷리스트와 월별 플래너 -->
         <div class="w-3/4">
-            <!-- 버킷리스트 섹션 -->
+            <!-- 버킷리스트를 맨 위로 이동 -->
             <div class="mb-6">
-                <!-- 기존 버킷리스트 코드 유지 -->
+                <button id="bucketListBtn" 
+                        class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                    <span class="text-lg font-semibold">2025 버킷리스트</span>
+                    <span id="bucket-list-arrow">▼</span>
+                </button>
+                <div id="bucketListContent" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
+                    <div id="bucketListItems" class="space-y-4">
+                        <!-- 버킷리스트 아이템들이 여기에 추가됩니다 -->
+                    </div>
+                    <button onclick="addBucketListItem()" 
+                            class="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+                        + 새로운 목표 추가
+                    </button>
+                </div>
             </div>
 
             <!-- 월별 플래너 섹션 -->
             <div id="monthly-planners" class="space-y-4">
-                <!-- 기존 월별 플래너 코드 유지 -->
+                <!-- 월별 플래너 내용 -->
             </div>
 
             <!-- 데이터 백업/복원 버튼 -->
             <div class="flex justify-end space-x-2 mt-4">
-                <!-- 기존 백업/복원 버튼 코드 유지 -->
+                <!-- 백업/복원 버튼 -->
             </div>
         </div>
     </div>
@@ -724,67 +753,110 @@ function loadAllMonthlyData() {
     }
 }
  // 메모 기능 관련 코드
-    const memoList = document.getElementById('memo-list');
+        // 메모 색상 배열 추가
+const memoColors = [
+    'bg-pink-50 hover:bg-pink-100',
+    'bg-blue-50 hover:bg-blue-100',
+    'bg-green-50 hover:bg-green-100',
+    'bg-purple-50 hover:bg-purple-100',
+    'bg-yellow-50 hover:bg-yellow-100',
+    'bg-indigo-50 hover:bg-indigo-100'
+];
+
+function addMemo() {
+    const memoId = 'memo-' + Date.now();
+    const randomColor = memoColors[Math.floor(Math.random() * memoColors.length)];
+    const memoDiv = document.createElement('div');
+    memoDiv.className = `${randomColor} p-3 rounded-lg shadow-sm transition duration-300`;
+    memoDiv.id = memoId;
+    memoDiv.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+                <span class="text-gray-400 text-sm">${new Date().toLocaleDateString()}</span>
+            </div>
+            <button onclick="deleteMemo('${memoId}')" 
+                    class="text-gray-400 hover:text-red-500 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <textarea 
+            class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            placeholder="메모를 입력하세요"
+            rows="3"
+            onchange="saveMemoToLocalStorage()"
+        ></textarea>
+    `;
     
-    function addMemo
-() {
-        const memoId = 'memo-' + Date.now();
-        const memoDiv = document.createElement('div');
-        memoDiv.className = 'flex items-center space-x-2';
-        memoDiv.id = memoId;
-        memoDiv.innerHTML = `
-            <textarea class="w-full p-2 border rounded-md" 
-                      placeholder="메모를 입력하세요" style="background-color:#f0f8ff;"
-                      onchange="saveMemoToLocalStorage()"></textarea>
-                <button onclick="deleteMemo('${memoId}')" 
-                        class="text-red-500 text-sm px-1">-</button>
-        `;
-        memoList.appendChild(memoDiv);
-        saveMemoToLocalStorage();
-    }
+const memoList = document.getElementById('memo-list');
+    memoList.insertBefore(memoDiv, memoList.firstChild); // 새 메모를 맨 위에 추가
+    saveMemoToLocalStorage();
+}
 
-    function deleteMemo(memoId) {
-        const memo = document.getElementById(memoId);
-        if (memo) {
+function deleteMemo(memoId) {
+    const memo = document.getElementById(memoId);
+    if (memo && confirm('이 메모를 삭제하시겠습니까?')) {
+        memo.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
             memo.remove();
-             saveMemoToLocalStorage();
-        }
+            saveMemoToLocalStorage();
+        }, 200);
     }
+}
 
-    function saveMemoToLocalStorage() {
-      try {
-        const memos = Array.from(memoList.querySelectorAll('textarea')).map(textarea => textarea.value);
-         localStorage.setItem('memos2025', JSON.stringify(memos));
-         return true;
-       } catch (error) {
-         console.error('저장 실패:', error);
-          showSaveStatus('저장 중 문제가 발생했습니다', 'error');
-         return false;
-     }
+function saveMemoToLocalStorage() {
+    try {
+        const memos = Array.from(document.querySelectorAll('#memo-list > div')).map(memoDiv => ({
+            id: memoDiv.id,
+            text: memoDiv.querySelector('textarea').value,
+            date: memoDiv.querySelector('.text-gray-400').textContent,
+            color: Array.from(memoDiv.classList).find(cls => cls.startsWith('bg-'))
+        }));
+        localStorage.setItem('memos2025', JSON.stringify(memos));
+        return true;
+    } catch (error) {
+        console.error('메모 저장 실패:', error);
+        return false;
     }
+}
 
-     function loadMemoFromLocalStorage() {
-       const memos = JSON.parse(localStorage.getItem('memos2025') || '[]');
-       memoList.innerHTML = '';
-       if (memos.length === 0) {
-            addMemo();
-            return;
-        }
-        memos.forEach(memoText => {
-            const memoId = 'memo-' + Date.now();
-            const memoDiv = document.createElement('div');
-           memoDiv.className = 'flex items-center space-x-2';
-            memoDiv.id = memoId;
-            memoDiv.innerHTML = `
-            <textarea class="w-full p-2 border rounded-md" 
-                    placeholder="메모를 입력하세요" style="background-color:#f0f8ff;"
-                      onchange="saveMemoToLocalStorage()">${memoText}</textarea>
-              <button onclick="deleteMemo('${memoId}')" 
-                        class="text-red-500 text-sm px-1">-</button>
+function loadMemoFromLocalStorage() {
+    const memos = JSON.parse(localStorage.getItem('memos2025') || '[]');
+    const memoList = document.getElementById('memo-list');
+    memoList.innerHTML = '';
+    
+    memos.forEach(memo => {
+        const memoDiv = document.createElement('div');
+        memoDiv.className = `${memo.color} p-3 rounded-lg shadow-sm transition duration-300`;
+        memoDiv.id = memo.id;
+        memoDiv.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-gray-400 text-sm">${memo.date}</span>
+                </div>
+                <button onclick="deleteMemo('${memo.id}')" 
+                        class="text-gray-400 hover:text-red-500 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <textarea 
+                class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                placeholder="메모를 입력하세요"
+                rows="3"
+                onchange="saveMemoToLocalStorage()"
+            >${memo.text}</textarea>
         `;
         memoList.appendChild(memoDiv);
-        });
-     }
+    });
+
+    if (memos.length === 0) {
+        addMemo(); // 첫 로드시 빈 메모 하나 추가
+    }
+}
+        
 // 자동 저장 이벤트 추가
 document.addEventListener('input', (e) => {
         if (e.target.tagName === 'TEXTAREA') {
