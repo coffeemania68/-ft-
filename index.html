@@ -188,27 +188,40 @@
                         <p id="alarm-display" class="text-center text-gray-600"></p>
                     </div>
 
-                    <!-- 메모 섹션 -->
-                    <div class="memo-container" draggable="true">
-                        <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">메모</h2>
-                        <div id="memo-list" class="space-y-3">
-                            <!-- 메모들이 여기에 추가됩니다 -->
-                        </div>
-                        <button onclick="addMemo()" class="mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300">
-                            + 새 메모 추가
-                        </button>
-                    </div>
+                   <!-- 메모 섹션 -->
+<div class="memo-container" draggable="true">
+    <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">메모</h2>
+    <div id="memo-list">
+        <div class="flex items-center bg-white/50 p-3 rounded-lg">
+            <textarea 
+                class="w-full p-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                placeholder="메모를 입력하세요"
+                rows="1"
+                onchange="saveMemoToLocalStorage()"
+            ></textarea>
+            <button onclick="deleteMemo(this.parentElement)" 
+                    class="text-red-400 hover:text-red-600 transition duration-300 ml-2">
+                ✕
+            </button>
+        </div>
+    </div>
+    <button onclick="addMemo()" class="mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300">
+        + 새 메모 추가
+    </button>
+</div>
                 </div>
             </div>
 
             <!-- 오른쪽 메인 컨텐츠 -->
             <div class="w-3/4">
                 <!-- 버킷리스트 섹션 -->
-<div class="mb-8">  <!-- mb-6에서 mb-8로 변경하여 간격 증가 -->
-    <button id="bucketListBtn" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
-        <span class="text-lg font-semibold">2025 버킷리스트</span>
+<div class="mb-10">  <!-- mb-8에서 mb-10으로 증가: 아래 여백 더 증가 -->
+    <button id="bucketListBtn" 
+            class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-white p-6 rounded-lg shadow-lg flex justify-between items-center text-xl">
+        <span class="text-xl font-bold">2025 버킷리스트</span>
         <span id="bucket-list-arrow">▼</span>
     </button>
+</div>
                 
                     <div id="bucketListContent" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
                         <div id="bucketListItems" class="space-y-4">
@@ -358,15 +371,6 @@ function initAlarm() {
 }
 
 // 메모 관련 코드
-const memoColors = [
-    'bg-blue-50',
-    'bg-purple-50',
-    'bg-green-50',
-    'bg-yellow-50',
-    'bg-pink-50',
-    'bg-indigo-50'
-];
-
 function addMemo() {
     const memoId = 'memo-' + Date.now();
     
@@ -405,63 +409,11 @@ function deleteMemo(memoId) {
     }
 }
 
-// 드래그 앤 드롭 관련 코드
-function initDragAndDrop() {
-    const sideContainer = document.getElementById('side-container');
-    const draggables = sideContainer.querySelectorAll('[draggable="true"]');
-    let draggedItem = null;
-
-    draggables.forEach(item => {
-        item.addEventListener('dragstart', () => {
-            draggedItem = item;
-            setTimeout(() => item.classList.add('opacity-50'), 0);
-        });
-
-        item.addEventListener('dragend', () => {
-            draggedItem = null;
-            item.classList.remove('opacity-50');
-        });
-
-        item.addEventListener('dragover', e => {
-            e.preventDefault();
-            const box = item.getBoundingClientRect();
-            const offset = e.clientY - box.top - box.height / 2;
-            
-            if (item !== draggedItem) {
-                if (offset < 0) {
-                    sideContainer.insertBefore(draggedItem, item);
-                } else {
-                    sideContainer.insertBefore(draggedItem, item.nextSibling);
-                }
-            }
-        });
-    });
-
-    // 컨테이너 순서 저장
-    const observer = new MutationObserver(() => {
-        const order = Array.from(sideContainer.children).map(child => child.className);
-        localStorage.setItem('containerOrder', JSON.stringify(order));
-    });
-
-    observer.observe(sideContainer, { childList: true });
-}
-
 // 로컬 스토리지 관련 코드
 function saveMemoToLocalStorage() {
     const memos = Array.from(document.querySelectorAll('#memo-list > div')).map(memo => ({
         id: memo.id,
-        text: memo.querySelector('textarea').value,
-        date: memo.querySelector('.text-gray-500').textContent,
-        color: Array.from(memo.classList)[0]
-    }));
-    
-    localStorage.setItem('memos2025', JSON.stringify(memos));
-}
-function saveMemoToLocalStorage() {
-    const memos = Array.from(document.querySelectorAll('#memo-list > div')).map(memo => ({
-        id: memo.id,
-        text: memo.querySelector('textarea').value,
-        color: Array.from(memo.classList)[0]
+        text: memo.querySelector('textarea').value
     }));
     
     localStorage.setItem('memos2025', JSON.stringify(memos));
@@ -474,16 +426,22 @@ function loadMemoFromLocalStorage() {
     
     memos.forEach(memo => {
         const memoDiv = document.createElement('div');
-        memoDiv.className = `${memo.color} p-3 rounded-lg shadow-sm transition duration-300`;
+        memoDiv.className = 'p-3 rounded-lg shadow-sm transition duration-300';
         memoDiv.id = memo.id;
         
         memoDiv.innerHTML = `
-            <textarea 
-                class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-green-500"
-                placeholder="메모를 입력하세요"
-                rows="1"
-                onchange="saveMemoToLocalStorage()"
-            >${memo.text || ''}</textarea>
+            <div class="flex items-center">
+                <textarea 
+                    class="w-full p-2 border rounded-md bg-white/50 focus:ring-2 focus:ring-green-500"
+                    placeholder="메모를 입력하세요"
+                    rows="1"
+                    onchange="saveMemoToLocalStorage()"
+                >${memo.text || ''}</textarea>
+                <button onclick="deleteMemo('${memo.id}')" 
+                        class="text-red-400 hover:text-red-600 transition duration-300 ml-2">
+                    ✕
+                </button>
+            </div>
         `;
         
         memoList.appendChild(memoDiv);
@@ -493,7 +451,6 @@ function loadMemoFromLocalStorage() {
         addMemo();
     }
 }
-     
        // 버킷리스트 관련 함수
 function toggleBucketList() {
     const content = document.getElementById('bucketListContent');
@@ -679,5 +636,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('bucketListBtn').addEventListener('click', toggleBucketList);
 });
   </script> 
+<footer class="text-center text-gray-600 text-sm mt-8 pb-4">
+    © 2025 CoffeeMania's Planner. All rights reserved.
+</footer>    
 </body>
 </html>
