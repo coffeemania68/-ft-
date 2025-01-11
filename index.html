@@ -88,6 +88,21 @@
                 margin-bottom: 1rem;
             }
         }
+
+                     /* style 태그 내에 추가 */
+/* 월별 버튼 스타일 */
+.month-1-btn { background: linear-gradient(135deg, #90caf9, #42a5f5); }
+.month-2-btn { background: linear-gradient(135deg, #f48fb1, #ec407a); }
+.month-3-btn { background: linear-gradient(135deg, #dce775, #c0ca33); }
+.month-4-btn { background: linear-gradient(135deg, #81d4fa, #29b6f6); }
+.month-5-btn { background: linear-gradient(135deg, #ce93d8, #ab47bc); }
+.month-6-btn { background: linear-gradient(135deg, #aed581, #7cb342); }
+.month-7-btn { background: linear-gradient(135deg, #ffb74d, #fb8c00); }
+.month-8-btn { background: linear-gradient(135deg, #4dd0e1, #00acc1); }
+.month-9-btn { background: linear-gradient(135deg, #fff176, #ffd835); }
+.month-10-btn { background: linear-gradient(135deg, #ff8a65, #f4511e); }
+.month-11-btn { background: linear-gradient(135deg, #ba68c8, #8e24aa); }
+.month-12-btn { background: linear-gradient(135deg, #9fa8da, #5c6bc0); }
     </style>
 </head>
 
@@ -146,6 +161,41 @@
             <!-- 오른쪽 메인 컨텐츠 -->
             <div class="w-3/4">
                 <!-- 여기에 기존 버킷리스트와 월별 플래너 코드가 들어갑니다 -->
+   
+     <!-- 버킷리스트 섹션 -->
+<div class="mb-6">
+    <button id="bucketListBtn" 
+            class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
+        <span class="text-lg font-semibold">2025 버킷리스트</span>
+        <span id="bucket-list-arrow">▼</span>
+    </button>
+    <div id="bucketListContent" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
+        <div id="bucketListItems" class="space-y-4">
+            <!-- 버킷리스트 아이템들이 여기에 추가됩니다 -->
+        </div>
+        <button onclick="addBucketListItem()" 
+                class="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+            + 새로운 목표 추가
+        </button>
+    </div>
+</div>
+
+<!-- 월별 플래너 섹션 -->
+<div id="monthly-planners" class="space-y-4">
+    <!-- 월별 플래너는 JavaScript로 생성됩니다 -->
+</div>
+
+<!-- 데이터 백업/복원 버튼 -->
+<div class="flex justify-end space-x-2 mt-4">
+    <button onclick="exportData()" 
+            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
+        <span>💾 데이터 백업</span>
+    </button>
+    <label class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer flex items-center">
+        <span>📥 백업 복원</span>
+        <input type="file" onchange="importData(this.files[0])" class="hidden" accept=".json">
+    </label>
+</div>
             </div>
         </div>
     </div>
@@ -386,6 +436,190 @@ function loadMemoFromLocalStorage() {
         addMemo();
     }
 }
+       // 버킷리스트 관련 함수
+function toggleBucketList() {
+    const content = document.getElementById('bucketListContent');
+    const arrow = document.getElementById('bucket-list-arrow');
+    content.classList.toggle('hidden');
+    arrow.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+}
+
+function addBucketListItem() {
+    const container = document.getElementById('bucketListItems');
+    const itemId = 'item-' + Date.now();
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
+    itemDiv.id = itemId;
+    
+    itemDiv.innerHTML = `
+        <input type="text" 
+               class="w-full sm:w-auto flex-1 p-2 border rounded-md" 
+               placeholder="새로운 목표를 입력하세요"
+               onchange="saveToLocalStorage()">
+        <div class="flex items-center space-x-1 w-full sm:w-auto justify-between sm:justify-start">
+            <div class="flex space-x-1">
+                ${Array(5).fill(0).map(() => `
+                    <input type="checkbox" 
+                           class="form-checkbox h-5 w-5 text-purple-600"
+                           onchange="saveToLocalStorage()">
+                `).join('')}
+            </div>
+            <button onclick="deleteBucketItem('${itemId}')"
+                    class="text-red-500 hover:text-red-700 px-2">
+                ✕
+            </button>
+        </div>
+    `;
+    container.appendChild(itemDiv);
+    saveToLocalStorage();
+}
+
+function deleteBucketItem(itemId) {
+    const item = document.getElementById(itemId);
+    if (item && confirm('이 목표를 삭제하시겠습니까?')) {
+        item.remove();
+        saveToLocalStorage();
+    }
+}
+
+// 월별 플래너 관련 함수
+function createMonthlyPlanners() {
+    const container = document.getElementById('monthly-planners');
+    for (let month = 1; month <= 12; month++) {
+        const monthDiv = document.createElement('div');
+        monthDiv.className = 'monthly-planner';
+        monthDiv.innerHTML = `
+            <button class="w-full month-${month}-btn text-white p-4 rounded-lg shadow-md flex justify-between items-center"
+                    onclick="toggleMonth(${month})">
+                <span class="text-lg font-semibold">${month}월 플래너</span>
+                <span id="month-${month}-arrow">▼</span>
+            </button>
+            <div id="month-${month}-content" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold">월간 목표</h3>
+                    <textarea class="w-full p-2 border rounded-md" 
+                             placeholder="이번 달 목표를 입력하세요"
+                             onchange="saveMonthlyData(${month})"></textarea>
+                    
+                    <div id="weeks-${month}" class="weekly-planners space-y-4">
+                        <div class="week-planner bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-medium">1주차</h4>
+                                <button onclick="deleteWeek(this.parentElement.parentElement)" 
+                                        class="text-red-500 hover:text-red-700">
+                                    삭제
+                                </button>
+                            </div>
+                            <textarea class="w-full p-2 border rounded-md" 
+                                     placeholder="이번 주 계획을 입력하세요"
+                                     onchange="saveMonthlyData(${month})"></textarea>
+                        </div>
+                    </div>
+                    
+                    <button onclick="addWeek(${month})" 
+                            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        + 주차 추가
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(monthDiv);
+    }
+}
+
+function toggleMonth(month) {
+    const content = document.getElementById(`month-${month}-content`);
+    const arrow = document.getElementById(`month-${month}-arrow`);
+    content.classList.toggle('hidden');
+    arrow.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+}
+
+function addWeek(monthId) {
+    const weekContainer = document.getElementById(`weeks-${monthId}`);
+    const weekCount = weekContainer.children.length + 1;
+    const weekDiv = document.createElement('div');
+    weekDiv.className = 'week-planner bg-gray-50 p-4 rounded-lg mt-4';
+    weekDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+            <h4 class="font-medium">${weekCount}주차</h4>
+            <button onclick="deleteWeek(this.parentElement.parentElement)" 
+                    class="text-red-500 hover:text-red-700">
+                삭제
+            </button>
+        </div>
+        <textarea class="w-full p-2 border rounded-md" 
+                  placeholder="이번 주 계획을 입력하세요"
+                  onchange="saveMonthlyData(${monthId})"></textarea>
+    `;
+    weekContainer.appendChild(weekDiv);
+    saveMonthlyData(monthId);
+}
+
+function deleteWeek(weekElement) {
+    if (confirm('이 주차를 삭제하시겠습니까?')) {
+        weekElement.remove();
+        const monthId = weekElement.closest('[id^="month-"]').id.split('-')[1];
+        saveMonthlyData(monthId);
+    }
+}
+
+// 데이터 저장 및 로드 함수
+function saveToLocalStorage() {
+    const items = Array.from(document.querySelectorAll('#bucketListItems > div')).map(item => ({
+        text: item.querySelector('input[type="text"]').value,
+        checks: Array.from(item.querySelectorAll('input[type="checkbox"]')).map(cb => cb.checked)
+    }));
+    localStorage.setItem('bucketList2025', JSON.stringify(items));
+}
+
+function loadFromLocalStorage() {
+    const items = JSON.parse(localStorage.getItem('bucketList2025') || '[]');
+    const container = document.getElementById('bucketListItems');
+    container.innerHTML = '';
+    
+    if (items.length === 0) {
+        addBucketListItem();
+        return;
+    }
+
+    items.forEach(item => {
+        const itemId = 'item-' + Date.now();
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
+        itemDiv.id = itemId;
+        itemDiv.innerHTML = `
+            <input type="text" 
+                   class="w-full sm:w-auto flex-1 p-2 border rounded-md" 
+                   value="${item.text}"
+                   onchange="saveToLocalStorage()">
+            <div class="flex items-center space-x-1 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex space-x-1">
+                    ${item.checks.map(checked => `
+                        <input type="checkbox" 
+                               class="form-checkbox h-5 w-5 text-purple-600"
+                               ${checked ? 'checked' : ''}
+                               onchange="saveToLocalStorage()">
+                    `).join('')}
+                </div>
+                <button onclick="deleteBucketItem('${itemId}')"
+                        class="text-red-500 hover:text-red-700 px-2">
+                    ✕
+                </button>
+            </div>
+        `;
+        container.appendChild(itemDiv);
+    });
+}
+
+// 초기화 함수에 추가
+document.addEventListener('DOMContentLoaded', () => {
+    // 기존 초기화 코드...
+    createMonthlyPlanners();
+    loadFromLocalStorage();
+    
+    // 버킷리스트 토글 버튼 이벤트 리스너
+    document.getElementById('bucketListBtn').addEventListener('click', toggleBucketList);
+});
   </script> 
 </body>
 </html>
