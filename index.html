@@ -249,30 +249,18 @@
         <span>📥 백업 복원</span>
         <input type="file" onchange="importData(this.files[0])" class="hidden" accept=".json">
     </label>
-</div>
-<!-- 데이터 백업/복원 버튼 아래 공유 기능 추가 -->
-<div class="flex justify-end space-x-2 mt-4">
      <button onclick="copyLink()" 
             class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center">
          <span>🔗 링크 복사</span>
      </button>
-    <!-- 카카오톡 공유 버튼 (구현 필요) -->
-   <button onclick="shareToKakaoTalk()"
-       class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center">
-       <span>💬 카카오톡</span>
-   </button>
-    <!-- 일반 SNS 공유 버튼 (구현 필요) -->
-    <button onclick="shareToSNS()"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
-       <span>📤 SNS 공유</span>
-   </button>
 </div>
+
             </div>
         </div>
     </div>
 
 <!-- 버전 전환 알림 -->
-<div class="fixed bottom-4 right-4 bg-white/90 p-4 rounded-lg shadow-lg">
+<div class="fixed bottom-4 right-4 bg-white/90 p-4 rounded-lg shadow-lg z-10">
     <p class="text-sm text-gray-600 mb-2">💡 모바일에 최적화된 버전도 있습니다!</p>
     <a href="https://coffeemania68.github.io/share/planner.html" 
        class="text-blue-500 hover:text-blue-700 text-sm flex items-center">
@@ -432,7 +420,7 @@ function initTimer() {
 
     function resetTimer() {
         pauseTimer();
-        timeLeft = parseInt(timerDurationSelect.value);
+        timeLeft = parseInt(timerDurationSelect.value) * 60;  // 초 단위로 변환
         updateDisplay();
     }
 
@@ -572,7 +560,7 @@ function addBucketListItem() {
     const container = document.getElementById('bucketListItems');
     const itemId = 'item-' + Date.now();
     const itemDiv = document.createElement('div');
-        itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
+    itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
     itemDiv.id = itemId;
     
     itemDiv.innerHTML = `
@@ -723,7 +711,7 @@ function loadFromLocalStorage() {
                                class="form-checkbox h-5 w-5 text-purple-600"
                                ${checked ? 'checked' : ''}
                                onchange="saveToLocalStorage()">
-                    `).join('')}
+                                                   `).join('')}
                 </div>
                 <button onclick="deleteBucketItem('${itemId}')"
                         class="text-red-500 hover:text-red-700 px-2">
@@ -847,19 +835,14 @@ for (let month = 1; month <= 12; month++) {
         alert('링크가 복사되었습니다.');
     }
       
-    function shareToKakaoTalk() {
-    // 카카오톡 공유 API 또는 링크 생성 로직 구현
-      alert('카카오톡 공유 기능은 현재 구현되지 않았습니다.');
-    }
-
-   function shareToSNS() {
-       // SNS 공유 로직 구현 (웹 공유 API 또는 해당 SNS의 공유 기능 활용)
-     alert('SNS 공유 기능은 현재 구현되지 않았습니다.');
-    }
   </script> 
 <footer class="text-center text-gray-600 text-sm mt-8 pb-4">
     © 2025 CoffeeMania's Planner. All rights reserved.
 </footer>    
 </body>
 </html>
-    
+
+
+
+
+                               
