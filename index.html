@@ -3,37 +3,964 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>버킷리스트 플래너</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="2025 CoffeeMania's Planner - 기록이 현실이 되는 순간">
+    <title>2025 CoffeeMania's Planner</title>
+
+    <!-- 웹 앱 아이콘 설정 -->
+    <link rel="apple-touch-icon" href="https://cdn.litt.ly/images/JqbOGc9p8Y1Ayy0ulNVoEw2TihLwpVK1?s=600x600&m=outside&f=webp">
+    <link rel="icon" type="image/webp" href="https://cdn.litt.ly/images/JqbOGc9p8Y1Ayy0ulNVoEw2TihLwpVK1?s=600x600&m=outside&f=webp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="2025 CoffeeMania's Planner">
+
+    <!-- 스타일시트 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+       /* 헤더 스타일 */
+    .header-container {
+        position: relative;
+        min-height: 200px;
+    }
+
+    /* 모바일 버전 (기본) */
+    .header-slider {
+        position: relative;
+        overflow: hidden;
+        height: 200px;
+    }
+
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    .slide:nth-child(1) {
+        background-image: url('https://cdn.litt.ly/images/JqbOGc9p8Y1Ayy0ulNVoEw2TihLwpVK1?s=600x600&m=outside&f=webp');
+    }
+
+    .slide:nth-child(2) {
+        background-image: url('https://blog.kakaocdn.net/dn/PwuUk/btsLCEcohDa/rbCuGpl6kt5keQrq3kcgg1/img.png');
+    }
+
+    .slide:nth-child(3) {
+        background-image: url('https://blog.kakaocdn.net/dn/RNx8Z/btsLCDkfJdv/3a2DyBsY4PEHn1YB2FDKJk/img.png');
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+
+    /* PC 버전 */
+    @media (min-width: 768px) {
+        .header-slider {
+            display: none;
+        }
+
+        .header-pc {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem;
+            height: 200px;
+        }
+
+        .header-image {
+            flex: 1;
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    /* 모바일에서는 PC 버전 숨기기 */
+    @media (max-width: 767px) {
+        .header-pc {
+            display: none;
+        }
+    }
+    .side-container{
+        display:flex;
+        flex-direction:column;
+        width: 250px;
+        gap: 1rem;
+      }
+        .side-container > div{
+          background-color: #fff;
+           padding: 10px;
+           border-radius: 10px;
+        }
+      .timer-alarm-container {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap; /* 모바일에서 컨테이너 아래로 줄바꿈 */
+      }
+      .timer-container, .alarm-container{
+          flex: 1;
+           text-align: center;
+      }
+      .memo-container textarea {
+        min-height: 30px;
+         line-height: 1.2; /* 글자 간격 조정 */
+        resize: vertical; /* 세로 크기 조절 허용 */
+         background-color:#f0f8ff;
+          outline: 1px solid #1e40af;
+           width: 100%;
+      }
+       .memo-container .flex{
+             flex-wrap: wrap; /* 줄바꿈 */
+           align-items: center;/* 중앙정렬 */
+            justify-content: space-between;
+       }
+    @media (max-width: 767px) {
+      .side-container{
+          display: none;
+        }
+    }
+        /* 클로버 애니메이션 (유지) */
+    @keyframes float {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(100px, -100px) rotate(360deg); }
+    }
+
+    .clover {
+        position: fixed;
+        pointer-events: none;
+        z-index: -1;
+        opacity: 0.5;
+    }
+        #monthly-planners {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .monthly-planner {
+            transition: all 0.3s ease;
+        }
+
+        .monthly-planner.active-month {
+            order: -1;
+            position: sticky;
+            top: 1rem;
+            z-index: 10;
+        }
+
+        /* 월별 버튼 및 컨텐츠 스타일 */
+        .month-1-btn { background: linear-gradient(135deg, #90caf9, #42a5f5); }
+        .month-2-btn { background: linear-gradient(135deg, #f48fb1, #ec407a); }
+        .month-3-btn { background: linear-gradient(135deg, #dce775, #c0ca33); }
+        .month-4-btn { background: linear-gradient(135deg, #81d4fa, #29b6f6); }
+        .month-5-btn { background: linear-gradient(135deg, #ce93d8, #ab47bc); }
+        .month-6-btn { background: linear-gradient(135deg, #aed581, #7cb342); }
+        .month-7-btn { background: linear-gradient(135deg, #ffb74d, #fb8c00); }
+        .month-8-btn { background: linear-gradient(135deg, #4dd0e1, #00acc1); }
+        .month-9-btn { background: linear-gradient(135deg, #fff176, #ffd835); }
+        .month-10-btn { background: linear-gradient(135deg, #ff8a65, #f4511e); }
+        .month-11-btn { background: linear-gradient(135deg, #ba68c8, #8e24aa); }
+        .month-12-btn { background: linear-gradient(135deg, #9fa8da, #5c6bc0); }
+
+        .month-1 { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+        .month-2 { background: linear-gradient(135deg, #f8bbd0, #f48fb1); }
+        .month-3 { background: linear-gradient(135deg, #f0f4c3, #dce775); }
+        .month-4 { background: linear-gradient(135deg, #e1f5fe, #b3e5fc); }
+        .month-5 { background: linear-gradient(135deg, #f3e5f5, #e1bee7); }
+        .month-6 { background: linear-gradient(135deg, #dcedc8, #c5e1a5); }
+        .month-7 { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+        .month-8 { background: linear-gradient(135deg, #e0f7fa, #b2ebf2); }
+        .month-9 { background: linear-gradient(135deg, #fff9c4, #fff59d); }
+        .month-10 { background: linear-gradient(135deg, #ffebee, #ffcdd2); }
+        .month-11 { background: linear-gradient(135deg, #f3e5f5, #e1bee7); }
+        .month-12 { background: linear-gradient(135deg, #e8eaf6, #c5cae9); }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>나의 버킷리스트</h1>
-        <ul id="bucket-list">
-            <!-- 버킷리스트 항목이 여기에 추가됩니다 -->
-        </ul>
-        <input type="text" id="new-item" placeholder="새로운 목표를 입력하세요">
-        <button id="add-button">추가</button>
 
-        <div class="timer-container">
-            <h2>작업 타이머</h2>
-            <div class="timer-display" id="timer-display">25:00</div>
-            <div class="timer-controls">
-                <button id="start-button">시작</button>
-                <button id="pause-button">일시정지</button>
-                <button id="reset-button">초기화</button>
-            </div>
-            <div class="alarm-controls">
-                <input type="number" id="alarm-minutes" placeholder="분" min="0">
-                <button id="set-alarm-button">알람 설정</button>
-            </div>
-        </div>
+<body class="bg-gray-50">
+    <!-- 네잎클로버 배경 -->
+    <div id="cloverContainer"></div>
 
-        <div class="work-time-container">
-            <h2>오늘 작업 시간</h2>
-            <div class="work-time-display" id="work-time-display">00:00:00</div>
+    <!-- 헤더 섹션 -->
+<div class="header-container">
+    <!-- 모바일 버전 (슬라이더) -->
+    <div class="header-slider">
+        <div class="slide active"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="flex items-center justify-center h-full">
+            <div class="header-content text-center">
+                <h1 class="text-4xl font-bold text-white mb-2">2025 연간 플래너</h1>
+                <p class="text-gray-100">나의 목표와 꿈을 기록하는 공간</p>
+            </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- PC 버전 (나란히 배열) -->
+    <div class="header-pc">
+        <div class="header-image">
+            <img src="https://cdn.litt.ly/images/JqbOGc9p8Y1Ayy0ulNVoEw2TihLwpVK1?s=600x600&m=outside&f=webp" alt="header 1">
+        </div>
+        <div class="header-image">
+            <img src="https://blog.kakaocdn.net/dn/PwuUk/btsLCEcohDa/rbCuGpl6kt5keQrq3kcgg1/img.png" alt="header 2">
+            <div class="header-content">
+                <h1 class="text-4xl font-bold text-white mb-2">2025 연간 플래너</h1>
+                <p class="text-gray-100">나의 목표와 꿈을 기록하는 공간</p>
+            </div>
+        </div>
+        <div class="header-image">
+            <img src="https://blog.kakaocdn.net/dn/RNx8Z/btsLCDkfJdv/3a2DyBsY4PEHn1YB2FDKJk/img.png" alt="header 3">
+        </div>
+    </div>
+</div>
+   
+    <div class="max-w-4xl mx-auto p-4 flex relative">
+          <!-- 사이드 컨테이너 (PC) -->
+       <div id = "side-container" class="side-container absolute right-0 top-0 mt-4 mr-4">
+        <div class="timer-container  shadow-md cursor-move">
+                <h2 class="text-xl font-semibold mb-2 text-center">작업 타이머</h2>
+                         <select id="timer-duration" class="w-full p-2 border rounded-md">
+                             <option value="60">1시간</option>
+                             <option value="120">2시간</option>
+                             <option value="180">3시간</option>
+                        </select>
+                    <div class="timer-display text-2xl font-medium" id="timer-display">00:00</div>
+                    <div class="timer-controls mt-2">
+                         <button id="start-button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg">시작</button>
+                         <button id="pause-button" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg">일시정지</button>
+                         <button id="reset-button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg">초기화</button>
+                    </div>
+        </div>
+        <div class="alarm-container  shadow-md cursor-move">
+            <h2 class="text-xl font-semibold mb-2 text-center">알람 설정</h2>
+           <input type="time" id="alarm-time" class="w-full p-2 border rounded-md">
+           <p class="text-gray-700" id="alarm-display"></p>
+          </div>
+        <div class="memo-container shadow-md cursor-move">
+           <h2 class="text-xl font-semibold mb-2 text-center">메모</h2>
+             <div id="memo-list" class="space-y-1">
+             </div>
+        </div>
+       </div>
+   
+   
+        <!-- 버킷리스트 섹션 -->
+        <div class="mb-6 flex-1">
+            <button id="bucketListBtn" 
+                    class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                <span class="text-lg font-semibold">2025 버킷리스트</span>
+                <span id="bucket-list-arrow">▼</span>
+            </button>
+            <div id="bucketListContent" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
+                <div id="bucketListItems" class="space-y-4">
+                    <!-- 버킷리스트 아이템들이 여기에 추가됩니다 -->
+                </div>
+                <button onclick="addBucketListItem()" 
+                        class="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+                    + 새로운 목표 추가
+                </button>
+            </div>
+        </div>
+
+        <!-- 월별 플래너 섹션 -->
+        <div id="monthly-planners" class="space-y-4 flex-1">
+            <!-- 월별 플래너가 여기에 추가됩니다 -->
+        </div>
+        
+        
+ <div class="flex justify-end space-x-2 mb-4" style="margin-top: 20px;">
+            <button onclick="exportData()" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
+                <span>💾 데이터 백업</span>
+            </button>
+            <label class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer flex items-center">
+                <span>📥 백업 복원</span>
+                <input type="file" onchange="importData(this.files[0])" class="hidden" accept=".json">
+            </label>
+        </div>
+    </div>
+      <script>
+         // 드래그 앤 드롭
+        let draggingElement = null;
+    
+        function initDragAndDrop() {
+             const sideContainer = document.getElementById('side-container');
+             const draggableItems = sideContainer.querySelectorAll('.timer-container, .alarm-container, .memo-container');
+    
+          draggableItems.forEach(item => {
+        item.addEventListener('mousedown', dragStart);
+          });
+           
+        document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', dragEnd);
+            
+        }
+        
+        function dragStart(event) {
+           draggingElement = event.target;
+         }
+    
+     function drag(event) {
+       if (!draggingElement) return;
+          event.preventDefault();
+          draggingElement.style.position = 'relative';
+         draggingElement.style.left = event.clientX - draggingElement.offsetWidth / 2 + 'px';
+         draggingElement.style.top = event.clientY - draggingElement.offsetHeight / 2 + 'px';
+     }
+
+    function dragEnd(event) {
+       draggingElement = null;
+     }
+        // 네잎클로버 생성 및 애니메이션
+        function createClovers() {
+            const container = document.getElementById('cloverContainer');
+            for (let i = 0; i < 20; i++) {
+                const clover = document.createElement('div');
+                clover.className = 'clover';
+                clover.innerHTML = '🍀';
+                clover.style.left = Math.random() * 100 + 'vw';
+                clover.style.top = Math.random() * 100 + 'vh';
+                clover.style.animation = `float ${5 + Math.random() * 10}s linear infinite`;
+                container.appendChild(clover);
+            }
+        }
+
+        // 버킷리스트 토글 함수
+        function toggleBucketList() {
+            const content = document.getElementById('bucketListContent');
+            const arrow = document.getElementById('bucket-list-arrow');
+            content.classList.toggle('hidden');
+            arrow.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+        }
+
+        // 버킷리스트 아이템 추가 함수
+       function addBucketListItem() {
+    const container = document.getElementById('bucketListItems');
+    const itemId = 'item-' + Date.now();
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
+    itemDiv.id = itemId;
+    itemDiv.innerHTML = `
+        <input type="text" 
+               class="w-full sm:w-auto flex-1 p-2 border rounded-md" 
+               placeholder="새로운 목표를 입력하세요"
+               onchange="saveToLocalStorage()">
+        <div class="flex items-center space-x-1 w-full sm:w-auto justify-between sm:justify-start">
+            <div class="flex space-x-1">
+                ${Array(5).fill(0).map(() => `
+                    <input type="checkbox" 
+                           class="form-checkbox h-5 w-5 text-purple-600"
+                           onchange="saveToLocalStorage()">
+                `).join('')}
+            </div>
+              <button onclick="addMemo()"
+                    class="px-2 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+                   +
+                </button>
+        </div>
+    `;
+    container.appendChild(itemDiv);
+    saveToLocalStorage();
+}
+
+        // 아이템 삭제 함수
+        function deleteItem(itemId) {
+            const item = document.getElementById(itemId);
+            if (item && confirm('이 목표를 삭제하시겠습니까?')) {
+                item.remove();
+                saveToLocalStorage();
+            }
+        }
+
+        // 주차 삭제 함수
+        function deleteWeek(weekElement) {
+            if (confirm('이 주차를 삭제하시겠습니까?')) {
+                weekElement.remove();
+            }
+        }
+
+// 로컬 스토리지에 저장
+function saveToLocalStorage() {
+    try {
+        const items = [];
+        document.querySelectorAll('#bucketListItems > div').forEach(item => {
+            if (item.querySelector('input[type="text"]')) {  // 텍스트 입력란이 있는 항목만 저장
+                const text = item.querySelector('input[type="text"]').value;
+                const checks = Array.from(item.querySelectorAll('input[type="checkbox"]'))
+                                  .map(cb => cb.checked);
+                items.push({ text, checks });
+            }
+        });
+        localStorage.setItem('bucketList2025', JSON.stringify(items));
+        return true;
+    } catch (error) {
+        console.error('저장 실패:', error);
+        showSaveStatus('저장 중 문제가 발생했습니다', 'error');
+        return false;
+    }
+}
+
+// 저장 상태 표시 함수
+function showSaveStatus(message) {
+    const status = document.createElement('div');
+    status.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg transition-opacity duration-500';
+    status.textContent = message;
+    document.body.appendChild(status);
+    setTimeout(() => status.remove(), 1500);
+}
+
+// 자동 저장 이벤트
+document.addEventListener('blur', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        saveToLocalStorage();
+        showSaveStatus('저장되었습니다');
+    }
+}, true);
+
+window.addEventListener('beforeunload', () => {
+    saveToLocalStorage();
+});
+
+// 로컬 스토리지에서 불러오기
+function loadFromLocalStorage() {
+    const items = JSON.parse(localStorage.getItem('bucketList2025') || '[]');
+    const container = document.getElementById('bucketListItems');
+    container.innerHTML = '';
+
+// 환영 메시지 추가
+const welcomeDiv = document.createElement('div');
+welcomeDiv.className = 'bg-gradient-to-r from-purple-100 to-pink-100 p-4 rounded-lg mb-4 text-center shadow-sm';
+welcomeDiv.innerHTML = `
+    <p class="text-gray-700 font-medium">
+        <a href="https://mypawstory.com/2025-%ec%97%b0%ea%b0%84-%ed%94%8c%eb%9e%98%eb%84%88/" 
+           class="text-blue-500 underline hover:text-blue-700">
+           2025 버킷리스트 사용법 가이드
+        </a>
+    </p>
+`;
+container.appendChild(welcomeDiv);
+
+    // 저장된 아이템들 로드
+    items.forEach(item => {
+        const itemId = 'item-' + Date.now();
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
+        itemDiv.id = itemId;
+        itemDiv.innerHTML = `
+            <input type="text" 
+                   class="w-full sm:w-auto flex-1 p-2 border rounded-md" 
+                   value="${item.text}"
+                   onchange="saveToLocalStorage()">
+            <div class="flex items-center space-x-1 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex space-x-1">
+                    ${item.checks.map(checked => `
+                        <input type="checkbox" 
+                               class="form-checkbox h-5 w-5 text-purple-600"
+                               ${checked ? 'checked' : ''}
+                               onchange="saveToLocalStorage()">
+                    `).join('')}
+                </div>
+                   <button onclick="addMemo()"
+                    class="px-2 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+                   +
+                </button>
+            </div>
+        `;
+        container.appendChild(itemDiv);
+    });
+
+    // 아이템이 없는 경우 안내 메시지 추가
+    if (items.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'text-center text-gray-500 py-4';
+        emptyMessage.innerHTML = '새로운 목표를 추가해보세요!';
+        container.appendChild(emptyMessage);
+    }
+}
+        
+        // 주차 추가
+        function addWeek(monthId) {
+            const weekContainer = document.getElementById(`weeks-${monthId}`);
+            const weekCount = weekContainer.children.length + 1;
+            const weekDiv = document.createElement('div');
+            weekDiv.className = 'week-planner bg-gray-50 p-4 rounded-lg mt-4 relative';
+            weekDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-medium">${weekCount}주차</h4>
+                    <button onclick="deleteWeek(this.parentElement.parentElement)" 
+                            class="text-red-500 hover:text-red-700">
+                        삭제
+                    </button>
+                </div>
+                <textarea class="w-full p-2 border rounded-md" 
+                          placeholder="이번 주 계획을 입력하세요"></textarea>
+            `;
+            weekContainer.appendChild(weekDiv);
+        }
+        
+        // 월별 플래너 생성
+        function createMonthlyPlanners() {
+            const container = document.getElementById('monthly-planners');
+            for (let month = 1; month <= 12; month++) {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'monthly-planner';
+                monthDiv.innerHTML = `
+                    <button class="w-full month-${month}-btn text-white p-4 rounded-lg shadow-md flex justify-between items-center"
+                            onclick="toggleMonth(${month})">
+                        <span class="text-lg font-semibold">${month}월 플래너</span>
+                        <span id="month-${month}-arrow">▼</span>
+                    </button>
+                    <div id="month-${month}-content" class="hidden month-${month} rounded-lg shadow-md mt-2 p-4">
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-semibold">월간 목표</h3>
+                            <textarea class="w-full p-2 border rounded-md" 
+                                    placeholder="이번 달 목표를 입력하세요"></textarea>
+                            
+                            <div id="weeks-${month}" class="weekly-planners space-y-4">
+                                <div class="week-planner bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="font-medium">1주차</h4>
+                                        <button onclick="deleteWeek(this.parentElement.parentElement)" 
+                                                class="text-red-500 hover:text-red-700">
+                                            삭제
+                                        </button>
+                                    </div>
+                                    <textarea class="w-full p-2 border rounded-md" 
+                                            placeholder="이번 주 계획을 입력하세요"></textarea>
+                                </div>
+                            </div>
+                            
+                            <button onclick="addWeek(${month})" 
+                                    class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                + 주차 추가
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(monthDiv);
+            }
+        }
+
+  // 월별 플래너 토글
+        function toggleMonth(month) {
+            const allMonthPlanners = document.querySelectorAll('.monthly-planner');
+            const selectedPlanner = document.querySelector(`.monthly-planner:nth-child(${month})`);
+            const content = document.getElementById(`month-${month}-content`);
+            const arrow = document.getElementById(`month-${month}-arrow`);
+
+            // 다른 모든 월 닫기
+            allMonthPlanners.forEach(planner => {
+                planner.classList.remove('active-month');
+                const monthContent = planner.querySelector('[id^="month-"][id$="-content"]');
+                const monthArrow = planner.querySelector('[id^="month-"][id$="-arrow"]');
+                if (monthContent) {
+                    monthContent.classList.add('hidden');
+                    if (monthArrow) monthArrow.textContent = '▼';
+                }
+            });
+
+            // 선택된 월 토글
+            if (content.classList.contains('hidden')) {
+                // 열기
+                content.classList.remove('hidden');
+                arrow.textContent = '▲';
+                selectedPlanner.classList.add('active-month');
+                
+                // 스크롤 위치 조정
+                const bucketList = document.querySelector('.mb-6');
+                const offset = bucketList.getBoundingClientRect().bottom + window.scrollY + 20;
+                window.scrollTo({
+                    top: offset,
+                    behavior: 'smooth'
+                });
+            } else {
+                // 닫기
+                content.classList.add('hidden');
+                arrow.textContent = '▼';
+                selectedPlanner.classList.remove('active-month');
+            }
+        }
+// 월별 데이터 저장
+function saveMonthlyData(month) {
+    const monthContent = document.getElementById(`month-${month}-content`);
+    if (!monthContent) return;
+
+    const monthlyGoal = monthContent.querySelector('textarea').value;
+    const weeklyPlans = Array.from(monthContent.querySelectorAll('.week-planner')).map(week => ({
+        weekNumber: week.querySelector('h4').textContent,
+        plan: week.querySelector('textarea').value
+    }));
+
+    localStorage.setItem(`month-${month}-2025`, JSON.stringify({
+        monthlyGoal,
+        weeklyPlans
+    }));
+}
+
+// 월별 데이터 불러오기
+function loadMonthlyData(month) {
+    const savedData = localStorage.getItem(`month-${month}-2025`);
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        const monthContent = document.getElementById(`month-${month}-content`);
+        if (!monthContent) return;
+
+        // 월간 목표 복원
+        const monthlyGoalTextarea = monthContent.querySelector('textarea');
+        if (monthlyGoalTextarea) {
+            monthlyGoalTextarea.value = data.monthlyGoal;
+        }
+
+        // 주차별 계획 복원
+        const weekContainer = document.getElementById(`weeks-${month}`);
+        if (weekContainer) {
+            weekContainer.innerHTML = ''; // 기존 주차 계획 초기화
+            data.weeklyPlans.forEach(weekPlan => {
+                const weekDiv = document.createElement('div');
+                weekDiv.className = 'week-planner bg-gray-50 p-4 rounded-lg';
+                weekDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-medium">${weekPlan.weekNumber}</h4>
+                        <button onclick="deleteWeek(this.parentElement.parentElement)" 
+                                class="text-red-500 hover:text-red-700">
+                            삭제
+                        </button>
+                    </div>
+                    <textarea class="w-full p-2 border rounded-md" 
+                            onchange="saveMonthlyData(${month})"
+                            placeholder="이번 주 계획을 입력하세요">${weekPlan.plan}</textarea>
+                `;
+                weekContainer.appendChild(weekDiv);
+            });
+        }
+    }
+}
+
+// 모든 월별 데이터 저장
+function saveAllMonthlyData() {
+    for (let month = 1; month <= 12; month++) {
+        saveMonthlyData(month);
+    }
+}
+
+// 모든 월별 데이터 불러오기
+function loadAllMonthlyData() {
+    for (let month = 1; month <= 12; month++) {
+        loadMonthlyData(month);
+    }
+}
+ // 메모 기능 관련 코드
+    const memoList = document.getElementById('memo-list');
+    
+    function addMemo() {
+        const memoId = 'memo-' + Date.now();
+        const memoDiv = document.createElement('div');
+        memoDiv.className = 'flex items-center space-x-2';
+        memoDiv.id = memoId;
+        memoDiv.
+innerHTML = `
+            <textarea class="w-full p-2 border rounded-md" 
+                      placeholder="메모를 입력하세요" style="background-color:#f0f8ff;"
+                      onchange="saveMemoToLocalStorage()"></textarea>
+                <button onclick="deleteMemo('${memoId}')" 
+                        class="text-red-500 text-sm px-1">-</button>
+        `;
+        memoList.appendChild(memoDiv);
+        saveMemoToLocalStorage();
+    }
+
+    function deleteMemo(memoId) {
+        const memo = document.getElementById(memoId);
+        if (memo) {
+            memo.remove();
+             saveMemoToLocalStorage();
+        }
+    }
+
+    function saveMemoToLocalStorage() {
+      try {
+        const memos = Array.from(memoList.querySelectorAll('textarea')).map(textarea => textarea.value);
+         localStorage.setItem('memos2025', JSON.stringify(memos));
+         return true;
+       } catch (error) {
+         console.error('저장 실패:', error);
+          showSaveStatus('저장 중 문제가 발생했습니다', 'error');
+         return false;
+     }
+    }
+
+     function loadMemoFromLocalStorage() {
+       const memos = JSON.parse(localStorage.getItem('memos2025') || '[]');
+       memoList.innerHTML = '';
+       if (memos.length === 0) {
+            addMemo();
+            return;
+         }
+        memos.forEach(memoText => {
+            const memoId = 'memo-' + Date.now();
+            const memoDiv = document.createElement('div');
+           memoDiv.className = 'flex items-center space-x-2';
+            memoDiv.id = memoId;
+            memoDiv.innerHTML = `
+            <textarea class="w-full p-2 border rounded-md" 
+                    placeholder="메모를 입력하세요" style="background-color:#f0f8ff;"
+                      onchange="saveMemoToLocalStorage()">${memoText}</textarea>
+              <button onclick="deleteMemo('${memoId}')" 
+                        class="text-red-500 text-sm px-1">-</button>
+        `;
+        memoList.appendChild(memoDiv);
+        });
+     }
+// 자동 저장 이벤트 추가
+document.addEventListener('input', (e) => {
+        if (e.target.tagName === 'TEXTAREA') {
+          saveMemoToLocalStorage();
+           showSaveStatus('저장되었습니다');
+        }
+   const monthContent = e.target.closest('[id^="month-"][id$="-content"]');
+    if (monthContent) {
+        const month = monthContent.id.match(/month-(\d+)-content/)[1];
+        saveMonthlyData(month);
+        showSaveStatus('저장되었습니다');
+    }
+});
+// 기존 초기화 함수 수정
+document.addEventListener('DOMContentLoaded', () => {
+    createMonthlyPlanners();
+    loadFromLocalStorage();
+    loadAllMonthlyData(); 
+     loadMemoFromLocalStorage();
+        initDragAndDrop();
+    if (document.querySelectorAll('#bucketListItems > div').length === 0) {
+        addBucketListItem();
+    }
+    
+    document.getElementById('bucketListBtn').addEventListener('click', toggleBucketList);
+});
+ // 페이지 닫을 때 모든 데이터 저장
+window.addEventListener('beforeunload', () => {
+    saveToLocalStorage();
+    saveAllMonthlyData();
+   saveMemoToLocalStorage();
+});
+// 데이터 백업/복원 함수
+function exportData() {
+    const data = {
+        bucketList: JSON.parse(localStorage.getItem('bucketList2025') || '[]'),
+        monthlyPlans: {},
+        memos: JSON.parse(localStorage.getItem('memos2025') || '[]')
+    };
+    
+    // 월별 데이터 수집
+    for (let i = 1; i <= 12; i++) {
+        data.monthlyPlans[i] = JSON.parse(localStorage.getItem(`month-${i}-2025`) || 'null');
+    }
+
+    // 파일로 다운로드
+    const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `planner-backup-${new Date().toLocaleDateString()}.json`;
+    a.click();
+    showSaveStatus('백업 파일이 다운로드되었습니다');
+}
+
+function importData(file) {
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            // 데이터 복원
+            if (data.bucketList) {
+                localStorage.setItem('bucketList2025', JSON.stringify(data.bucketList));
+            }
+            
+            if (data.monthlyPlans) {
+                Object.entries(data.monthlyPlans).forEach(([month, plans]) => {
+                    if (plans) {
+                        localStorage.setItem(`month-${month}-2025`, JSON.stringify(plans));
+                    }
+                });
+            }
+              if (data.memos) {
+                localStorage.setItem('memos2025', JSON.stringify(data.memos));
+            }
+           
+            showSaveStatus('데이터가 복원되었습니다');
+            setTimeout(() => location.reload(), 1000); // 1초 후 페이지 새로고침
+        } catch (error) {
+            showSaveStatus('백업 파일 복원 중 오류가 발생했습니다', 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// 월별 데이터 저장 함수 수정 (성공/실패 알림 추가)
+function saveMonthlyData(month) {
+    try {
+        const monthContent = document.getElementById(`month-${month}-content`);
+        if (!monthContent) return;
+
+        const monthlyGoal = monthContent.querySelector('textarea').value;
+        const weeklyPlans = Array.from(monthContent.querySelectorAll('.week-planner')).map(week => ({
+            weekNumber: week.querySelector('h4').textContent,
+            plan: week.querySelector('textarea').value
+        }));
+
+        localStorage.setItem(`month-${month}-2025`, JSON.stringify({
+            monthlyGoal,
+            weeklyPlans
+        }));
+        
+        showSaveStatus(`${month}월 데이터가 저장되었습니다`);
+        return true;
+    } catch (error) {
+        console.error('저장 실패:', error);
+        showSaveStatus(`${month}월 데이터 저장 중 오류가 발생했습니다`, 'error');
+        return false;
+    }
+}
+
+// 저장 상태 표시 함수 수정 (에러 상태 추가)
+function showSaveStatus(message, type = 'success') {
+    const status = document.createElement('div');
+    status.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-white ${
+        type === 'error' ? 'bg-red-500' : 'bg-green-500'
+    }`;
+    status.textContent = message;
+    document.body.appendChild(status);
+    setTimeout(() => status.remove(), 2000);
+}
+
+ // 타이머,알람 자바스크립트 코드
+    const timerDisplay = document.getElementById('timer-display');
+    const startButton = document.getElementById('start-button');
+    const pauseButton = document.getElementById('pause-button');
+    const resetButton = document.getElementById('reset-button');
+    const timerDurationSelect = document.getElementById('timer-duration');
+    const alarmTimeInput = document.getElementById('alarm-time');
+    const setAlarmButton = document.getElementById('set-alarm-button');
+    const alarmDisplay = document.getElementById('alarm-display');
+    let timerInterval;
+    let timeLeft;
+    let isTimerRunning = false;
+    let alarmTimeout;
+    let selectedTimeInMinutes = parseInt(timerDurationSelect.value); // 초기값은 1시간
+  
+    // 초기 설정
+    timeLeft = selectedTimeInMinutes * 60
+    updateDisplay();
+
+   //타이머 설정 변경시
+    timerDurationSelect.addEventListener('change', () => {
+        selectedTimeInMinutes = parseInt(timerDurationSelect.value);
+        timeLeft = selectedTimeInMinutes * 60;
+       updateDisplay();
+    });
+
+    startButton.addEventListener('click', function () {
+        if (!isTimerRunning) {
+            startTimer();
+        }
+    });
+
+    pauseButton.addEventListener('click', function () {
+        if (isTimerRunning) {
+            pauseTimer();
+        }
+    });
+    
+    resetButton.addEventListener('click', function () {
+        resetTimer();
+    });
+     
+   setAlarmButton.addEventListener('click', function () {
+        setAlarm();
+    });
+
+    function startTimer() {
+        if (!isTimerRunning) {
+             isTimerRunning = true;
+             timerInterval = setInterval(updateTimer, 1000);
+        }
+    }
+    
+    function pauseTimer() {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+    }
+    
+    function resetTimer() {
+      pauseTimer();
+      timeLeft = selectedTimeInMinutes * 60;
+      updateDisplay();
+    }
+    
+     function updateTimer() {
+        timeLeft--;
+        if(timeLeft < 0) {
+          pauseTimer();
+          timeLeft = 0;
+        }
+        updateDisplay();
+      }
+
+    function updateDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    function setAlarm() {
+      clearTimeout(alarmTimeout);
+      const alarmTime = alarmTimeInput.value;
+       if(alarmTime) {
+        const [hours, minutes] = alarmTime.split(':').map(Number);
+         const now = new Date();
+          const alarmDate = new Date(now);
+         alarmDate.setHours(hours);
+        alarmDate.setMinutes(minutes);
+        alarmDate.setSeconds(0);
+        if(alarmDate <= now) {
+           alarmDate.setDate(alarmDate.getDate()+1);
+        }
+      const timeDiff = alarmDate.getTime() - now.getTime()
+         alarmTimeout = setTimeout(playAlarmSound, timeDiff);
+        alarmDisplay.textContent = `알람 설정: ${alarmTime}`
+      }
+    }
+    
+   function playAlarmSound() {
+         alert("알람!");
+          alarmDisplay.textContent = `알람 울림`;
+     }
+ updateDisplay();
+    </script>
+      <footer class="text-center text-gray-600 text-sm mt-8 pb-4">
+    © 2025 CoffeeMania's Planner. All rights reserved.
+</footer>
 </body>
-</html>
+</html>            
