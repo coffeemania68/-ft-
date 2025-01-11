@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -100,7 +100,17 @@
             display: none;
         }
     }
-   
+    .side-container{
+        display:flex;
+        flex-direction:column;
+        width: 250px;
+        gap: 1rem;
+      }
+        .side-container > div{
+          background-color: #fff;
+           padding: 10px;
+           border-radius: 10px;
+        }
       .timer-alarm-container {
           display: flex;
           gap: 1rem;
@@ -108,48 +118,25 @@
       }
       .timer-container, .alarm-container{
           flex: 1;
+           text-align: center;
       }
       .memo-container textarea {
         min-height: 30px;
          line-height: 1.2; /* 글자 간격 조정 */
         resize: vertical; /* 세로 크기 조절 허용 */
+         background-color:#f0f8ff;
+          outline: 1px solid #1e40af;
+           width: 100%;
       }
        .memo-container .flex{
              flex-wrap: wrap; /* 줄바꿈 */
            align-items: center;/* 중앙정렬 */
-       }
-       .memo-container .flex textarea {
-             flex: 1;
-        }
-        .memo-container textarea:focus {
-           outline: 1px solid #1e40af;
-        }
-     
-    @media (max-width: 767px) {
-        .timer-alarm-container {
-            flex-direction: column;
-        }
-            .timer-container, .alarm-container {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        
-       .memo-container{
-           margin-left: 0;
-           display: none;
-        }
-    
-         .timer-controls {
-            display: flex;
             justify-content: space-between;
-          }
-       .timer-controls button {
-         flex: 1; /* 각 버튼이 동일한 공간을 차지 */
-            margin: 0 5px; /* 버튼 간 여백 */
+       }
+    @media (max-width: 767px) {
+      .side-container{
+          display: none;
         }
-          .alarm-container button {
-        display:none;
-      }
     }
         /* 클로버 애니메이션 (유지) */
     @keyframes float {
@@ -246,12 +233,11 @@
     </div>
 </div>
    
-    <div class="max-w-4xl mx-auto p-4">
-        <!-- 변경 코드 시작 -->
-        <div class="mb-4">
-           <div class="timer-alarm-container">
-                <div class="timer-container bg-white p-4 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-2">작업 타이머</h2>
+    <div class="max-w-4xl mx-auto p-4 flex relative">
+          <!-- 사이드 컨테이너 (PC) -->
+       <div id = "side-container" class="side-container absolute right-0 top-0 mt-4 mr-4">
+        <div class="timer-container  shadow-md cursor-move">
+                <h2 class="text-xl font-semibold mb-2 text-center">작업 타이머</h2>
                          <select id="timer-duration" class="w-full p-2 border rounded-md">
                              <option value="60">1시간</option>
                              <option value="120">2시간</option>
@@ -263,23 +249,22 @@
                          <button id="pause-button" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg">일시정지</button>
                          <button id="reset-button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg">초기화</button>
                     </div>
-                </div>
-                <div class="alarm-container bg-white p-4 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-2">알람 설정</h2>
-                    <input type="time" id="alarm-time" class="w-full p-2 border rounded-md">
-                    <p class="text-gray-700" id="alarm-display"></p>
-                </div>
-            </div>
-              <div class="memo-container bg-white p-4 rounded-lg shadow-md mt-4">
-                <h2 class="text-xl font-semibold mb-2">메모</h2>
-                 <div id="memo-list" class="space-y-1">
-                 </div>
-            </div>
-         </div>
-        <!-- 변경 코드 끝 -->
+        </div>
+        <div class="alarm-container  shadow-md cursor-move">
+            <h2 class="text-xl font-semibold mb-2 text-center">알람 설정</h2>
+           <input type="time" id="alarm-time" class="w-full p-2 border rounded-md">
+           <p class="text-gray-700" id="alarm-display"></p>
+          </div>
+        <div class="memo-container shadow-md cursor-move">
+           <h2 class="text-xl font-semibold mb-2 text-center">메모</h2>
+             <div id="memo-list" class="space-y-1">
+             </div>
+        </div>
+       </div>
+   
    
         <!-- 버킷리스트 섹션 -->
-        <div class="mb-6">
+        <div class="mb-6 flex-1">
             <button id="bucketListBtn" 
                     class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
                 <span class="text-lg font-semibold">2025 버킷리스트</span>
@@ -297,7 +282,7 @@
         </div>
 
         <!-- 월별 플래너 섹션 -->
-        <div id="monthly-planners" class="space-y-4">
+        <div id="monthly-planners" class="space-y-4 flex-1">
             <!-- 월별 플래너가 여기에 추가됩니다 -->
         </div>
         
@@ -313,7 +298,38 @@
             </label>
         </div>
     </div>
-    <script>
+      <script>
+         // 드래그 앤 드롭
+        let draggingElement = null;
+    
+        function initDragAndDrop() {
+             const sideContainer = document.getElementById('side-container');
+             const draggableItems = sideContainer.querySelectorAll('.timer-container, .alarm-container, .memo-container');
+    
+          draggableItems.forEach(item => {
+        item.addEventListener('mousedown', dragStart);
+          });
+           
+        document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', dragEnd);
+            
+        }
+        
+        function dragStart(event) {
+           draggingElement = event.target;
+         }
+    
+     function drag(event) {
+       if (!draggingElement) return;
+          event.preventDefault();
+          draggingElement.style.position = 'relative';
+         draggingElement.style.left = event.clientX - draggingElement.offsetWidth / 2 + 'px';
+         draggingElement.style.top = event.clientY - draggingElement.offsetHeight / 2 + 'px';
+     }
+
+    function dragEnd(event) {
+       draggingElement = null;
+     }
         // 네잎클로버 생성 및 애니메이션
         function createClovers() {
             const container = document.getElementById('cloverContainer');
@@ -660,13 +676,13 @@ function loadAllMonthlyData() {
         const memoDiv = document.createElement('div');
         memoDiv.className = 'flex items-center space-x-2';
         memoDiv.id = memoId;
-        memoDiv.innerHTML = `
+        memoDiv.
+       innerHTML = `
             <textarea class="w-full p-2 border rounded-md" 
                       placeholder="메모를 입력하세요" style="background-color:#f0f8ff;"
                       onchange="saveMemoToLocalStorage()"></textarea>
                 <button onclick="deleteMemo('${memoId}')" 
-
-                            class="text-red-500 text-sm px-1">-</button>
+                        class="text-red-500 text-sm px-1">-</button>
         `;
         memoList.appendChild(memoDiv);
         saveMemoToLocalStorage();
@@ -695,10 +711,10 @@ function loadAllMonthlyData() {
      function loadMemoFromLocalStorage() {
        const memos = JSON.parse(localStorage.getItem('memos2025') || '[]');
        memoList.innerHTML = '';
-        if (memos.length === 0) {
+       if (memos.length === 0) {
             addMemo();
             return;
-        }
+         }
         memos.forEach(memoText => {
             const memoId = 'memo-' + Date.now();
             const memoDiv = document.createElement('div');
@@ -733,6 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFromLocalStorage();
     loadAllMonthlyData(); 
      loadMemoFromLocalStorage();
+        initDragAndDrop();
     if (document.querySelectorAll('#bucketListItems > div').length === 0) {
         addBucketListItem();
     }
