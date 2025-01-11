@@ -369,10 +369,9 @@ const memoColors = [
 
 function addMemo() {
     const memoId = 'memo-' + Date.now();
-    const randomColor = memoColors[Math.floor(Math.random() * memoColors.length)];
     
     const memoDiv = document.createElement('div');
-    memoDiv.className = `${randomColor} p-3 rounded-lg shadow-sm transition duration-300`;
+    memoDiv.className = `p-3 rounded-lg shadow-sm transition duration-300`;
     memoDiv.id = memoId;
     
     memoDiv.innerHTML = `
@@ -384,7 +383,9 @@ function addMemo() {
                 onchange="saveMemoToLocalStorage()"
             ></textarea>
             <button onclick="deleteMemo('${memoId}')" 
-                    class="text-red-400 hover:text-red-600 ml-2">✕</button>
+                    class="text-red-400 hover:text-red-600 transition duration-300 ml-2">
+                ✕
+            </button>
         </div>
     `;
     
