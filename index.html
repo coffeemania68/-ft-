@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>버킷리스트 플래너</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>나의 버킷리스트</h1>
+        <ul id="bucket-list">
+            <!-- 버킷리스트 항목이 여기에 추가됩니다 -->
+        </ul>
+        <input type="text" id="new-item" placeholder="새로운 목표를 입력하세요">
+        <button id="add-button">추가</button>
+
+        <div class="timer-container">
+            <h2>작업 타이머</h2>
+            <div class="timer-display" id="timer-display">25:00</div>
+            <div class="timer-controls">
+                <button id="start-button">시작</button>
+                <button id="pause-button">일시정지</button>
+                <button id="reset-button">초기화</button>
+            </div>
+            <div class="alarm-controls">
+                <input type="number" id="alarm-minutes" placeholder="분" min="0">
+                <button id="set-alarm-button">알람 설정</button>
+            </div>
+        </div>
+
+        <div class="work-time-container">
+            <h2>오늘 작업 시간</h2>
+            <div class="work-time-display" id="work-time-display">00:00:00</div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
