@@ -525,11 +525,10 @@ function deleteMemo(memoId) {
 
 // 로컬 스토리지 관련 코드
 function saveMemoToLocalStorage() {
-    const memos = Array.from(document.querySelectorAll('#memo-list > div')).map(memo => ({
+     const memos = Array.from(document.querySelectorAll('#memo-list > div')).map(memo => ({
         id: memo.id,
         text: memo.querySelector('textarea').value
     }));
-    
     localStorage.setItem('memos2025', JSON.stringify(memos));
 }
 
