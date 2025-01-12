@@ -286,6 +286,10 @@
     createMonthlyPlanners();
     loadFromLocalStorage();
     
+     for (let month = 1; month <= 12; month++) {
+        loadMonthlyData(month);
+    }
+    
     // 버킷리스트 토글 버튼 이벤트 리스너
     document.getElementById('bucketListBtn').addEventListener('click', toggleBucketList);
 });
@@ -711,7 +715,7 @@ function loadFromLocalStorage() {
                                class="form-checkbox h-5 w-5 text-purple-600"
                                ${checked ? 'checked' : ''}
                                onchange="saveToLocalStorage()">
-                                                   `).join('')}
+                    `).join('')}
                 </div>
                 <button onclick="deleteBucketItem('${itemId}')"
                         class="text-red-500 hover:text-red-700 px-2">
@@ -726,7 +730,8 @@ function loadFromLocalStorage() {
 // 월별 데이터 저장 및 로드 함수
 function saveMonthlyData(month) {
     const monthData = {
-        goal: document.querySelector(`#month-${month}-content textarea:first-of-type`).value,
+        goal: document.querySelector(`#month-${month}-content textarea:first
+        -of-type`).value,
         weeks: Array.from(document.querySelectorAll(`#weeks-${month} .week-planner`)).map(week => ({
             text: week.querySelector('textarea').value
         }))
@@ -737,12 +742,13 @@ function saveMonthlyData(month) {
 function loadMonthlyData(month) {
     const storedData = localStorage.getItem(`monthlyPlannerData-${month}`);
     if(storedData){
+         try {
         const data = JSON.parse(storedData);
         document.querySelector(`#month-${month}-content textarea:first-of-type`).value = data.goal || '';
         const weekContainer = document.getElementById(`weeks-${month}`);
         weekContainer.innerHTML = '';
 
-    data.weeks.forEach((week, index) => {
+       data.weeks.forEach((week, index) => {
             const weekDiv = document.createElement('div');
             weekDiv.className = 'week-planner bg-gray-50 p-4 rounded-lg';
             weekDiv.innerHTML = `
@@ -759,6 +765,9 @@ function loadMonthlyData(month) {
             `;
             weekContainer.appendChild(weekDiv);
         });
+         } catch (error) {
+            console.error("Error parsing monthly data for month", month, error);
+        }
     }
 }
 
@@ -770,13 +779,18 @@ function exportData() {
         monthlyPlanners: {}
     };
 
-    for(let month=1; month<=12; month++){
+   for (let month = 1; month <= 12; month++) {
         const monthlyData = localStorage.getItem(`monthlyPlannerData-${month}`);
-        if(monthlyData){
-            data.monthlyPlanners[month] = JSON.parse(monthlyData);
-        }
-    }
-
+        if (monthlyData) {
+            try {
+                data.monthlyPlanners[month] = JSON.parse(monthlyData);
+            } catch (error) {
+                console.error("Error parsing monthly data for month", month, error);
+                data.monthlyPlanners[month] = null; // 오류 발생 시 null 할당
+             }
+           }
+      }
+       
     const json = JSON.stringify(data);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -803,16 +817,21 @@ function importData(file) {
             localStorage.setItem('bucketList2025', JSON.stringify(data.bucketList || []));
 
             for(let month=1; month<=12; month++){
-                if (data.monthlyPlanners && data.monthlyPlanners[month]){
-                    localStorage.setItem(`monthlyPlannerData-${month}`,JSON.stringify(data.monthlyPlanners[month]));
-                   loadMonthlyData(month);
-                } else{
-                    localStorage.removeItem(`monthlyPlannerData-${month}`);
-                   
+               if(data.monthlyPlanners && data.monthlyPlanners[month]){
+                   localStorage.setItem(`monthlyPlannerData-${month}`,JSON.stringify(data.monthlyPlanners[month]));
+                  loadMonthlyData(month);
+                }else{
+                  localStorage.removeItem(`monthlyPlannerData-${month}`);
                 }
             }
+
            loadMemoFromLocalStorage();
             loadFromLocalStorage();
+           
+             for (let month = 1; month <= 12; month++) {
+               loadMonthlyData(month);
+            }
+           
             alert('데이터 복원 성공!');
         } catch (error) {
             alert('데이터 복원 실패: 파일 형식을 확인해주세요.');
@@ -821,9 +840,6 @@ function importData(file) {
     };
     reader.readAsText(file);
 }
-for (let month = 1; month <= 12; month++) {
-        loadMonthlyData(month);
-    }
      
     function copyLink() {
         const dummy = document.createElement('input');
@@ -834,15 +850,9 @@ for (let month = 1; month <= 12; month++) {
         document.body.removeChild(dummy);
         alert('링크가 복사되었습니다.');
     }
-      
   </script> 
 <footer class="text-center text-gray-600 text-sm mt-8 pb-4">
     © 2025 CoffeeMania's Planner. All rights reserved.
 </footer>    
 </body>
 </html>
-
-
-
-
-                               
