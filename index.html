@@ -16,7 +16,7 @@
     <!-- 스타일시트 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    
+       
     <style>
         /* 기본 스타일 */
         body {
@@ -233,27 +233,29 @@
                         <p id="alarm-display" class="text-center text-gray-600"></p>
                     </div>
 
-                    <!-- 메모 섹션 수정 -->
-<div class="memo-container" draggable="true">
-    <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">메모</h2>
-    <div id="memo-list">
-        <div class="relative bg-white/50 rounded-lg">
-            <textarea 
-                class="w-full p-2 pr-8 border rounded-md focus:ring-2 focus:ring-green-500"
-                placeholder="메모를 입력하세요"
-                rows="1"
-                onchange="saveMemoToLocalStorage()"
-            ></textarea>
-            <button onclick="deleteMemo(this.parentElement)" 
-                    class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition duration-300">
-                ✕
-            </button>
-        </div>
-    </div>
-    <button onclick="addMemo()" class="mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300">
-        + 새 메모 추가
-    </button>
-</div>
+                    <!-- 메모 섹션 -->
+                    <div class="memo-container" draggable="true">
+                        <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">메모</h2>
+                        <div id="memo-list">
+                            <div class="relative bg-white/50 rounded-lg">
+                                <textarea 
+                                    class="w-full p-2 pr-8 border rounded-md focus:ring-2 focus:ring-green-500"
+                                    placeholder="메모를 입력하세요"
+                                    rows="1"
+                                    onchange="saveMemoToLocalStorage()"
+                                ></textarea>
+                                <button onclick="deleteMemo(this.parentElement)" 
+                                        class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition duration-300">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick="addMemo()" class="mt-4 w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300">
+                            + 새 메모 추가
+                        </button>
+                    </div>
+                </div>
+            </div>
                         <!-- 오른쪽 메인 컨텐츠 -->
             <div class="w-3/4">
                 <!-- 버킷리스트 섹션 -->
@@ -371,8 +373,7 @@
                 });
             });
         }
-
-        // Web Worker 코드
+                    // Web Worker 코드
         const workerCode = `
             let timerInterval;
             self.onmessage = function(e) {
@@ -448,8 +449,7 @@
 
             resetTimer();
         }
-
-        function initAlarm() {
+                    function initAlarm() {
             const alarmTimeInput = document.getElementById('alarm-time');
             const alarmDisplay = document.getElementById('alarm-display');
             const alarmSound = document.getElementById('alarmSound');
@@ -489,313 +489,383 @@
             alarmTimeInput.addEventListener('change', setAlarm);
         }
 
-       // "나머지 기존 함수들은 그대로 유지..." 부분을 다음 함수들로 교체
+        function addMemo() {
+            const memoId = 'memo-' + Date.now();
+            const memoDiv = document.createElement('div');
+            memoDiv.className = 'relative bg-white/50 rounded-lg';
+            memoDiv.id = memoId;
+            
+            memoDiv.innerHTML = `
+                <textarea 
+                    class="w-full p-2 pr-8 border rounded-md focus:ring-2 focus:ring-green-500"
+                    placeholder="메모를 입력하세요"
+                    rows="1"
+                    onchange="saveMemoToLocalStorage()"
+                ></textarea>
+                <button onclick="deleteMemo('${memoId}')" 
+                        class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition duration-300">
+                    ✕
+                </button>
+            `;
+            
+            const memoList = document.getElementById('memo-list');
+            memoList.insertBefore(memoDiv, memoList.firstChild);
+            saveMemoToLocalStorage();
+        }
 
-function initDragAndDrop() {
-    const containers = document.querySelectorAll('.timer-container, .alarm-container, .memo-container');
-    
-    containers.forEach(container => {
-        container.addEventListener('dragstart', (e) => {
-            e.target.style.opacity = '0.5';
-        });
+        function deleteMemo(memoId) {
+            const memo = document.getElementById(memoId);
+            if (memo && confirm('이 메모를 삭제하시겠습니까?')) {
+                memo.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    memo.remove();
+                    saveMemoToLocalStorage();
+                }, 200);
+            }
+        }
 
-        container.addEventListener('dragend', (e) => {
-            e.target.style.opacity = '';
-        });
-    });
-}
+        function saveMemoToLocalStorage() {
+            const memos = Array.from(document.querySelectorAll('#memo-list > div')).map(memo => ({
+                id: memo.id,
+                text: memo.querySelector('textarea').value
+            }));
+            localStorage.setItem('memos2025', JSON.stringify(memos));
+        }
 
-function toggleBucketList() {
-    const content = document.getElementById('bucketListContent');
-    const arrow = document.getElementById('bucket-list-arrow');
-    content.classList.toggle('hidden');
-    arrow.textContent = content.classList.contains('hidden') ? '▼' : '▲';
-}
+        function loadMemoFromLocalStorage() {
+            const memos = JSON.parse(localStorage.getItem('memos2025') || '[]');
+            const memoList = document.getElementById('memo-list');
+            memoList.innerHTML = '';
+            
+            memos.forEach(memo => {
+                const memoDiv = document.createElement('div');
+                memoDiv.className = 'relative bg-white/50 rounded-lg';
+                memoDiv.id = memo.id;
+                
+                memoDiv.innerHTML = `
+                    <textarea 
+                        class="w-full p-2 pr-8 border rounded-md focus:ring-2 focus:ring-green-500"
+                        placeholder="메모를 입력하세요"
+                        rows="1"
+                        onchange="saveMemoToLocalStorage()"
+                    >${memo.text || ''}</textarea>
+                    <button onclick="deleteMemo('${memo.id}')" 
+                            class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition duration-300">
+                        ✕
+                    </button>
+                `;
+                
+                memoList.appendChild(memoDiv);
+            });
 
-function addBucketListItem() {
-    const container = document.getElementById('bucketListItems');
-    const itemId = 'item-' + Date.now();
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
-    itemDiv.id = itemId;
-    
-    itemDiv.innerHTML = `
-        <input type="text" 
-               class="w-full sm:w-auto flex-1 p-2 border rounded-md" 
-               placeholder="새로운 목표를 입력하세요"
-               onchange="saveToLocalStorage()">
-        <div class="flex items-center space-x-1 w-full sm:w-auto justify-between sm:justify-start">
-            <div class="flex space-x-1">
-                ${Array(5).fill(0).map(() => `
-                    <input type="checkbox" 
-                           class="form-checkbox h-5 w-5 text-purple-600"
+            if (memos.length === 0) {
+                addMemo();
+            }
+        }
+
+        function initDragAndDrop() {
+            const containers = document.querySelectorAll('.timer-container, .alarm-container, .memo-container');
+            
+            containers.forEach(container => {
+                container.addEventListener('dragstart', (e) => {
+                    e.target.style.opacity = '0.5';
+                });
+
+                container.addEventListener('dragend', (e) => {
+                    e.target.style.opacity = '';
+                });
+            });
+        }
+                    function toggleBucketList() {
+            const content = document.getElementById('bucketListContent');
+            const arrow = document.getElementById('bucket-list-arrow');
+            content.classList.toggle('hidden');
+            arrow.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+        }
+
+        function addBucketListItem() {
+            const container = document.getElementById('bucketListItems');
+            const itemId = 'item-' + Date.now();
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
+            itemDiv.id = itemId;
+            
+            itemDiv.innerHTML = `
+                <input type="text" 
+                       class="w-full sm:w-auto flex-1 p-2 border rounded-md" 
+                       placeholder="새로운 목표를 입력하세요"
+                       onchange="saveToLocalStorage()">
+                <div class="flex items-center space-x-1 w-full sm:w-auto justify-between sm:justify-start">
+                    <div class="flex space-x-1">
+                        ${Array(5).fill(0).map(() => `
+                            <input type="checkbox" 
+                                   class="form-checkbox h-5 w-5 text-purple-600"
+                                   onchange="saveToLocalStorage()">
+                        `).join('')}
+                    </div>
+                    <button onclick="deleteBucketItem('${itemId}')"
+                            class="text-red-500 hover:text-red-700 px-2">
+                        ✕
+                    </button>
+                </div>
+            `;
+            container.appendChild(itemDiv);
+            saveToLocalStorage();
+        }
+
+        function deleteBucketItem(itemId) {
+            const item = document.getElementById(itemId);
+            if (item && confirm('이 목표를 삭제하시겠습니까?')) {
+                item.remove();
+                saveToLocalStorage();
+            }
+        }
+
+        function createMonthlyPlanners() {
+            const container = document.getElementById('monthly-planners');
+            for (let month = 1; month <= 12; month++) {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'monthly-planner';
+                monthDiv.innerHTML = `
+                    <button class="w-full month-${month}-btn text-white p-4 rounded-lg shadow-md flex justify-between items-center"
+                            onclick="toggleMonth(${month})">
+                        <span class="text-lg font-semibold">${month}월 플래너</span>
+                        <span id="month-${month}-arrow">▼</span>
+                    </button>
+                    <div id="month-${month}-content" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-semibold">월간 목표</h3>
+                            <textarea class="w-full p-2 border rounded-md" 
+                                     placeholder="이번 달 목표를 입력하세요"
+                                     onchange="saveMonthlyData(${month})"></textarea>
+                            
+                            <div id="weeks-${month}" class="weekly-planners space-y-4">
+                                <div class="week-planner bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="font-medium">1주차</h4>
+                                        <button onclick="deleteWeek(this.parentElement.parentElement)" 
+                                                class="text-red-500 hover:text-red-700">
+                                            삭제
+                                        </button>
+                                    </div>
+                                    <textarea class="w-full p-2 border rounded-md" 
+                                             placeholder="이번 주 계획을 입력하세요"
+                                             onchange="saveMonthlyData(${month})"></textarea>
+                                </div>
+                            </div>
+                            
+                            <button onclick="addWeek(${month})" 
+                                    class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                + 주차 추가
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(monthDiv);
+            }
+        }
+                    function toggleMonth(month) {
+            const content = document.getElementById(`month-${month}-content`);
+            const arrow = document.getElementById(`month-${month}-arrow`);
+            content.classList.toggle('hidden');
+            arrow.textContent = content.classList.contains('hidden') ? '▼' : '▲';
+        }
+
+        function addWeek(monthId) {
+            const weekContainer = document.getElementById(`weeks-${monthId}`);
+            const weekCount = weekContainer.children.length + 1;
+            const weekDiv = document.createElement('div');
+            weekDiv.className = 'week-planner bg-gray-50 p-4 rounded-lg mt-4';
+            weekDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-medium">${weekCount}주차</h4>
+                    <button onclick="deleteWeek(this.parentElement.parentElement)" 
+                            class="text-red-500 hover:text-red-700">
+                        삭제
+                    </button>
+                </div>
+                <textarea class="w-full p-2 border rounded-md" 
+                          placeholder="이번 주 계획을 입력하세요"
+                          onchange="saveMonthlyData(${monthId})"></textarea>
+            `;
+            weekContainer.appendChild(weekDiv);
+            saveMonthlyData(monthId);
+        }
+
+        function deleteWeek(weekElement) {
+            if (confirm('이 주차를 삭제하시겠습니까?')) {
+                weekElement.remove();
+                const monthId = weekElement.closest('[id^="month-"]').id.split('-')[1];
+                saveMonthlyData(monthId);
+            }
+        }
+
+        function saveToLocalStorage() {
+            const items = Array.from(document.querySelectorAll('#bucketListItems > div')).map(item => ({
+                text: item.querySelector('input[type="text"]').value,
+                checks: Array.from(item.querySelectorAll('input[type="checkbox"]')).map(cb => cb.checked)
+            }));
+            localStorage.setItem('bucketList2025', JSON.stringify(items));
+        }
+
+        function loadFromLocalStorage() {
+            const items = JSON.parse(localStorage.getItem('bucketList2025') || '[]');
+            const container = document.getElementById('bucketListItems');
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                addBucketListItem();
+                return;
+            }
+
+            items.forEach(item => {
+                const itemId = 'item-' + Date.now();
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
+                itemDiv.id = itemId;
+                itemDiv.innerHTML = `
+                    <input type="text" 
+                           class="w-full sm:w-auto flex-1 p-2 border rounded-md" 
+                           value="${item.text}"
                            onchange="saveToLocalStorage()">
-                `).join('')}
-            </div>
-            <button onclick="deleteBucketItem('${itemId}')"
-                    class="text-red-500 hover:text-red-700 px-2">
-                ✕
-            </button>
-        </div>
-    `;
-    container.appendChild(itemDiv);
-    saveToLocalStorage();
-}
+                    <div class="flex items-center space-x-1 w-full sm:w-auto justify-between sm:justify-start">
+                        <div class="flex space-x-1">
+                            ${item.checks.map(checked => `
+                                <input type="checkbox" 
+                                       class="form-checkbox h-5 w-5 text-purple-600"
+                                       ${checked ? 'checked' : ''}
+                                       onchange="saveToLocalStorage()">
+                            `).join('')}
+                        </div>
+                        <button onclick="deleteBucketItem('${itemId}')"
+                                class="text-red-500 hover:text-red-700 px-2">
+                            ✕
+                        </button>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
 
-function deleteBucketItem(itemId) {
-    const item = document.getElementById(itemId);
-    if (item && confirm('이 목표를 삭제하시겠습니까?')) {
-        item.remove();
-        saveToLocalStorage();
-    }
-}
+        function saveMonthlyData(month) {
+            const monthData = {
+                goal: document.querySelector(`#month-${month}-content textarea:first-of-type`).value,
+                weeks: Array.from(document.querySelectorAll(`#weeks-${month} .week-planner`)).map(week => ({
+                    text: week.querySelector('textarea').value
+                }))
+            };
+            localStorage.setItem(`monthlyPlannerData-${month}`, JSON.stringify(monthData));
+        }
 
-function createMonthlyPlanners() {
-    const container = document.getElementById('monthly-planners');
-    for (let month = 1; month <= 12; month++) {
-        const monthDiv = document.createElement('div');
-        monthDiv.className = 'monthly-planner';
-        monthDiv.innerHTML = `
-            <button class="w-full month-${month}-btn text-white p-4 rounded-lg shadow-md flex justify-between items-center"
-                    onclick="toggleMonth(${month})">
-                <span class="text-lg font-semibold">${month}월 플래너</span>
-                <span id="month-${month}-arrow">▼</span>
-            </button>
-            <div id="month-${month}-content" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
-                <div class="space-y-4">
-                    <h3 class="text-xl font-semibold">월간 목표</h3>
-                    <textarea class="w-full p-2 border rounded-md" 
-                             placeholder="이번 달 목표를 입력하세요"
-                             onchange="saveMonthlyData(${month})"></textarea>
-                    
-                    <div id="weeks-${month}" class="weekly-planners space-y-4">
-                        <div class="week-planner bg-gray-50 p-4 rounded-lg">
+        function loadMonthlyData(month) {
+            const storedData = localStorage.getItem(`monthlyPlannerData-${month}`);
+            if(storedData){
+                try {
+                    const data = JSON.parse(storedData);
+                    document.querySelector(`#month-${month}-content textarea:first-of-type`).value = data.goal || '';
+                    const weekContainer = document.getElementById(`weeks-${month}`);
+                    weekContainer.innerHTML = '';
+
+                    data.weeks.forEach((week, index) => {
+                        const weekDiv = document.createElement('div');
+                        weekDiv.className = 'week-planner bg-gray-50 p-4 rounded-lg';
+                        weekDiv.innerHTML = `
                             <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-medium">1주차</h4>
+                                <h4 class="font-medium">${index + 1}주차</h4>
                                 <button onclick="deleteWeek(this.parentElement.parentElement)" 
                                         class="text-red-500 hover:text-red-700">
                                     삭제
                                 </button>
                             </div>
                             <textarea class="w-full p-2 border rounded-md" 
-                                     placeholder="이번 주 계획을 입력하세요"
-                                     onchange="saveMonthlyData(${month})"></textarea>
-                        </div>
-                    </div>
-                    
-                    <button onclick="addWeek(${month})" 
-                            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        + 주차 추가
-                    </button>
-                </div>
-            </div>
-        `;
-        container.appendChild(monthDiv);
-    }
-}
-
-function toggleMonth(month) {
-    const content = document.getElementById(`month-${month}-content`);
-    const arrow = document.getElementById(`month-${month}-arrow`);
-    content.classList.toggle('hidden');
-    arrow.textContent = content.classList.contains('hidden') ? '▼' : '▲';
-}
-
-function addWeek(monthId) {
-    const weekContainer = document.getElementById(`weeks-${monthId}`);
-    const weekCount = weekContainer.children.length + 1;
-    const weekDiv = document.createElement('div');
-    weekDiv.className = 'week-planner bg-gray-50 p-4 rounded-lg mt-4';
-    weekDiv.innerHTML = `
-        <div class="flex justify-between items-center mb-2">
-            <h4 class="font-medium">${weekCount}주차</h4>
-            <button onclick="deleteWeek(this.parentElement.parentElement)" 
-                    class="text-red-500 hover:text-red-700">
-                삭제
-            </button>
-        </div>
-        <textarea class="w-full p-2 border rounded-md" 
-                  placeholder="이번 주 계획을 입력하세요"
-                  onchange="saveMonthlyData(${monthId})"></textarea>
-    `;
-    weekContainer.appendChild(weekDiv);
-    saveMonthlyData(monthId);
-}
-
-function deleteWeek(weekElement) {
-    if (confirm('이 주차를 삭제하시겠습니까?')) {
-        weekElement.remove();
-        const monthId = weekElement.closest('[id^="month-"]').id.split('-')[1];
-        saveMonthlyData(monthId);
-    }
-}
-
-function saveToLocalStorage() {
-    const items = Array.from(document.querySelectorAll('#bucketListItems > div')).map(item => ({
-        text: item.querySelector('input[type="text"]').value,
-        checks: Array.from(item.querySelectorAll('input[type="checkbox"]')).map(cb => cb.checked)
-    }));
-    localStorage.setItem('bucketList2025', JSON.stringify(items));
-}
-
-function loadFromLocalStorage() {
-    const items = JSON.parse(localStorage.getItem('bucketList2025') || '[]');
-    const container = document.getElementById('bucketListItems');
-    container.innerHTML = '';
-    
-    if (items.length === 0) {
-        addBucketListItem();
-        return;
-    }
-
-    items.forEach(item => {
-        const itemId = 'item-' + Date.now();
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 border rounded-lg';
-        itemDiv.id = itemId;
-        itemDiv.innerHTML = `
-            <input type="text" 
-                   class="w-full sm:w-auto flex-1 p-2 border rounded-md" 
-                   value="${item.text}"
-                   onchange="saveToLocalStorage()">
-            <div class="flex items-center space-x-1 w-full sm:w-auto justify-between sm:justify-start">
-                <div class="flex space-x-1">
-                    ${item.checks.map(checked => `
-                        <input type="checkbox" 
-                               class="form-checkbox h-5 w-5 text-purple-600"
-                               ${checked ? 'checked' : ''}
-                               onchange="saveToLocalStorage()">
-                    `).join('')}
-                </div>
-                <button onclick="deleteBucketItem('${itemId}')"
-                        class="text-red-500 hover:text-red-700 px-2">
-                    ✕
-                </button>
-            </div>
-        `;
-        container.appendChild(itemDiv);
-    });
-}
-
-function saveMonthlyData(month) {
-    const monthData = {
-        goal: document.querySelector(`#month-${month}-content textarea:first-of-type`).value,
-        weeks: Array.from(document.querySelectorAll(`#weeks-${month} .week-planner`)).map(week => ({
-            text: week.querySelector('textarea').value
-        }))
-    };
-    localStorage.setItem(`monthlyPlannerData-${month}`, JSON.stringify(monthData));
-}
-
-function loadMonthlyData(month) {
-    const storedData = localStorage.getItem(`monthlyPlannerData-${month}`);
-    if(storedData){
-        try {
-            const data = JSON.parse(storedData);
-            document.querySelector(`#month-${month}-content textarea:first-of-type`).value = data.goal || '';
-            const weekContainer = document.getElementById(`weeks-${month}`);
-            weekContainer.innerHTML = '';
-
-            data.weeks.forEach((week, index) => {
-                const weekDiv = document.createElement('div');
-                weekDiv.className = 'week-planner bg-gray-50 p-4 rounded-lg';
-                weekDiv.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="font-medium">${index + 1}주차</h4>
-                        <button onclick="deleteWeek(this.parentElement.parentElement)" 
-                                class="text-red-500 hover:text-red-700">
-                            삭제
-                        </button>
-                    </div>
-                    <textarea class="w-full p-2 border rounded-md" 
-                              placeholder="이번 주 계획을 입력하세요"
-                              onchange="saveMonthlyData(${month})">${week.text || ''}</textarea>
-                `;
-                weekContainer.appendChild(weekDiv);
-            });
-        } catch (error) {
-            console.error("Error parsing monthly data for month", month, error);
-        }
-    }
-}
-
-function exportData() {
-    const data = {
-        memos: JSON.parse(localStorage.getItem('memos2025') || '[]'),
-        bucketList: JSON.parse(localStorage.getItem('bucketList2025') || '[]'),
-        monthlyPlanners: {}
-    };
-
-    for (let month = 1; month <= 12; month++) {
-        const monthlyData = localStorage.getItem(`monthlyPlannerData-${month}`);
-        if (monthlyData) {
-            try {
-                data.monthlyPlanners[month] = JSON.parse(monthlyData);
-            } catch (error) {
-                console.error("Error parsing monthly data for month", month, error);
-                data.monthlyPlanners[month] = null;
-            }
-        }
-    }
-    
-    const json = JSON.stringify(data);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'planner_backup.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function importData(file) {
-    if (!file) {
-        alert("파일을 선택해주세요.");
-        return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const data = JSON.parse(e.target.result);
-            localStorage.setItem('memos2025', JSON.stringify(data.memos || []));
-            localStorage.setItem('bucketList2025', JSON.stringify(data.bucketList || []));
-
-            for(let month=1; month<=12; month++){
-                if(data.monthlyPlanners && data.monthlyPlanners[month]){
-                    localStorage.setItem(`monthlyPlannerData-${month}`,JSON.stringify(data.monthlyPlanners[month]));
-                    loadMonthlyData(month);
-                }else{
-                    localStorage.removeItem(`monthlyPlannerData-${month}`);
+                                      placeholder="이번 주 계획을 입력하세요"
+                                      onchange="saveMonthlyData(${month})">${week.text || ''}</textarea>
+                        `;
+                        weekContainer.appendChild(weekDiv);
+                    });
+                } catch (error) {
+                    console.error("Error parsing monthly data for month", month, error);
                 }
             }
+        }
 
-            loadMemoFromLocalStorage();
-            loadFromLocalStorage();
-            
+        function exportData() {
+            const data = {
+                memos: JSON.parse(localStorage.getItem('memos2025') || '[]'),
+                bucketList: JSON.parse(localStorage.getItem('bucketList2025') || '[]'),
+                monthlyPlanners: {}
+            };
+
             for (let month = 1; month <= 12; month++) {
-                loadMonthlyData(month);
+                const monthlyData = localStorage.getItem(`monthlyPlannerData-${month}`);
+                if (monthlyData) {
+                    try {
+                        data.monthlyPlanners[month] = JSON.parse(monthlyData);
+                    } catch (error) {
+                        console.error("Error parsing monthly data for month", month, error);
+                        data.monthlyPlanners[month] = null;
+                    }
+                }
             }
             
-            alert('데이터 복원 성공!');
-        } catch (error) {
-            alert('데이터 복원 실패: 파일 형식을 확인해주세요.');
-            console.error("Error parsing JSON:", error);
+            const json = JSON.stringify(data);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'planner_backup.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
-    };
-    reader.readAsText(file);
-}
 
-function copyLink() {
-    const dummy = document.createElement('input');
-    document.body.appendChild(dummy);
-    dummy.value = window.location.href;
-    dummy.select();
-    document.execCommand('copy');
-    document.body.removeChild(dummy);
-    alert('링크가 복사되었습니다.');
-}        
+        function importData(file) {
+            if (!file) {
+                alert("파일을 선택해주세요.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    localStorage.setItem('memos2025', JSON.stringify(data.memos || []));
+                    localStorage.setItem('bucketList2025', JSON.stringify(data.bucketList || []));
+
+                    for(let month=1; month<=12; month++){
+                        if(data.monthlyPlanners && data.monthlyPlanners[month]){
+                            localStorage.setItem(`monthlyPlannerData-${month}`,JSON.stringify(data.monthlyPlanners[month]));
+                            loadMonthlyData(month);
+                        }else{
+                            localStorage.removeItem(`monthlyPlannerData-${month}`);
+                        }
+                    }
+
+                    loadMemoFromLocalStorage();
+                    loadFromLocalStorage();
+                    
+                    for (let month = 1; month <= 12; month++) {
+                        loadMonthlyData(month);
+                    }
+                    
+                    alert('데이터 복원 성공!');
+                } catch (error) {
+                    alert('데이터 복원 실패: 파일 형식을 확인해주세요.');
+                    console.error("Error parsing JSON:", error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function copyLink() {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            alert('링크가 복사되었습니다.');
+        }
     </script>
     <footer class="text-center text-gray-600 text-sm mt-8 pb-4">
         © 2025 CoffeeMania's Planner. All rights reserved.
