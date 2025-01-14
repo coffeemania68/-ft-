@@ -621,55 +621,61 @@
             }
         }
 
-        function createMonthlyPlanners() {
-            const container = document.getElementById('monthly-planners');
-            for (let month = 1; month <= 12; month++) {
-                const monthDiv = document.createElement('div');
-                monthDiv.className = 'monthly-planner';
-                monthDiv.innerHTML = `
-                    <button class="w-full month-${month}-btn text-white p-4 rounded-lg shadow-md flex justify-between items-center"
-                            onclick="toggleMonth(${month})">
-                        <span class="text-lg font-semibold">${month}월 플래너</span>
-                        <span id="month-${month}-arrow">▼</span>
-                    </button>
-                    <div id="month-${month}-content" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
-                        <div class="space-y-4">
-                            <h3 class="text-xl font-semibold">월간 목표</h3>
-                            <textarea class="w-full p-2 border rounded-md" 
-                                     placeholder="이번 달 목표를 입력하세요"
-                                     onchange="saveMonthlyData(${month})"></textarea>
-                            
-                            <div id="weeks-${month}" class="weekly-planners space-y-4">
-                                <div class="week-planner bg-gray-50 p-4 rounded-lg">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h4 class="font-medium">1주차</h4>
-                                        <button onclick="deleteWeek(this.parentElement.parentElement)" 
-                                                class="text-red-500 hover:text-red-700">
-                                            삭제
-                                        </button>
-                                    </div>
-                                    <textarea class="w-full p-2 border rounded-md" 
-                                             placeholder="이번 주 계획을 입력하세요"
-                                             onchange="saveMonthlyData(${month})"></textarea>
-                                </div>
+       function createMonthlyPlanners() {
+  const container = document.getElementById("monthly-planners");
+  for (let month = 1; month <= 12; month++) {
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "monthly-planner";
+    monthDiv.id = `monthly-planner-${month}`; // 각 월별 div에 고유 ID 추가
+    monthDiv.innerHTML = `
+            <button class="w-full month-${month}-btn text-white p-4 rounded-lg shadow-md flex justify-between items-center"
+                    onclick="toggleMonth(${month})">
+                <span class="text-lg font-semibold">${month}월 플래너</span>
+                <span id="month-${month}-arrow">▼</span>
+            </button>
+            <div id="month-${month}-content" class="hidden bg-white rounded-lg shadow-md mt-2 p-4">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold">월간 목표</h3>
+                    <textarea class="w-full p-2 border rounded-md" 
+                             placeholder="이번 달 목표를 입력하세요"
+                             onchange="saveMonthlyData(${month})"></textarea>
+                    
+                    <div id="weeks-${month}" class="weekly-planners space-y-4">
+                        <div class="week-planner bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-medium">1주차</h4>
+                                <button onclick="deleteWeek(this.parentElement.parentElement)" 
+                                        class="text-red-500 hover:text-red-700">
+                                    삭제
+                                </button>
                             </div>
-                            
-                            <button onclick="addWeek(${month})" 
-                                    class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                                + 주차 추가
-                            </button>
+                            <textarea class="w-full p-2 border rounded-md" 
+                                     placeholder="이번 주 계획을 입력하세요"
+                                     onchange="saveMonthlyData(${month})"></textarea>
                         </div>
                     </div>
-                `;
-                container.appendChild(monthDiv);
-            }
-        }
+                    
+                    <button onclick="addWeek(${month})" 
+                            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        + 주차 추가
+                    </button>
+                </div>
+            </div>
+        `;
+    container.appendChild(monthDiv);
+  }
+}
                     function toggleMonth(month) {
-            const content = document.getElementById(`month-${month}-content`);
-            const arrow = document.getElementById(`month-${month}-arrow`);
-            content.classList.toggle('hidden');
-            arrow.textContent = content.classList.contains('hidden') ? '▼' : '▲';
-        }
+  const content = document.getElementById(`month-${month}-content`);
+  const arrow = document.getElementById(`month-${month}-arrow`);
+  content.classList.toggle("hidden");
+  arrow.textContent = content.classList.contains("hidden") ? "▼" : "▲";
+
+  // 선택한 월을 맨 위로 이동
+  const container = document.getElementById("monthly-planners");
+  const selectedMonthDiv = document.getElementById(`monthly-planner-${month}`);
+  container.prepend(selectedMonthDiv); // 선택된 월을 컨테이너의 맨 앞으로 이동
+}
 
         function addWeek(monthId) {
             const weekContainer = document.getElementById(`weeks-${monthId}`);
